@@ -16,6 +16,9 @@ const Note = sequelize.define('note', {
   data: {
     type: Sequelize.STRING,
   },
+  title: {
+    type: Sequelize.STRING,
+  },
 });
 // Note.sync({force: true}).then(function () {
 //   console.log("Created Notes Table")
