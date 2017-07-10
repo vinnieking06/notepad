@@ -29,8 +29,19 @@ export function items(state = [], action) {
   }
 }
 
+export function selectNote(state = {}, action) {
+  switch (action.type) {
+    case 'SELECT_NOTE':
+      return action.note;
+    case 'NEW_NOTE_VIEW':
+      return action.note;
+    default:
+      return state;
+  }
+}
 export default combineReducers({
   items,
   itemsHasErrored,
   itemsIsLoading,
+  selectNote,
 });

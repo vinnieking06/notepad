@@ -15,7 +15,7 @@ export default class Note extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.note) {
+    if (nextProps.note.id) {
       this.setState({ note: nextProps.note.data,
         title: nextProps.note.title,
         id: nextProps.note.id });
@@ -43,7 +43,7 @@ export default class Note extends React.Component {
   }
 
   render() {
-    if (this.props.note) {
+    if (this.props.note.id) {
       return (
         <div>
           Title <input value={this.state.title} onChange={this.handleTitle} /> <br />
