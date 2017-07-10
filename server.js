@@ -13,7 +13,7 @@ app.use(express.static(__dirname));
 const Note = require('./db');
 
 app.post('/notes', (req, res) => {
-  Note.create({ data: req.body.data, title: req.body.title }).then((err, note) => {
+  Note.create({ data: req.body.data, title: req.body.title }).then((note) => {
     res.json(note);
   });
 });
@@ -49,7 +49,7 @@ app.put('/notes/:id', (req, res) => {
   Note.update({ data: req.body.data, title: req.body.title }, { where: { id: req.params.id } })
   .then(() => {
     Note.findById(req.params.id)
-    .then((err, note) => {
+    .then((note) => {
       res.json(note);
     });
   });

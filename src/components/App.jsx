@@ -4,8 +4,7 @@
 
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import axios from 'axios';
-import { itemsFetchData } from './../redux/actions';
+import { itemsFetchData, selectNote, newNoteView, postNewNote, updateNote, deleteNote } from './../redux/actions';
 import './../App.css';
 import List from './List';
 import Note from './Note';
@@ -13,7 +12,6 @@ import Note from './Note';
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { notes: [], current: null };
     this.newNote = this.newNote.bind(this);
     this.getNotes = this.getNotes.bind(this);
     this.selectNote = this.selectNote.bind(this);
@@ -26,52 +24,39 @@ class App extends React.Component {
     this.getNotes();
   }
 
-  // getNotes(currentNote) {
   getNotes() {
     this.props.fetchData('http://localhost:3001/notes');
-    // .then((data) => {
-    //   this.setState({ notes: data.data, current: currentNote });
-    // });
   }
 
   newNote(input) {
-    axios.post('http://localhost:3001/notes', {
+    this.props.postNewNote('http://localhost:3001/notes', {
       data: input.note,
       title: input.title,
-    })
-    .then((response) => {
-      this.getNotes(response.data);
     });
   }
 
   updateNote(input) {
-    axios.put(`http://localhost:3001/notes/${input.id}`, {
+    this.props.updateNote(`http://localhost:3001/notes/${input.id}`, {
       data: input.note,
       title: input.title,
-    })
-    .then((response) => {
-      this.getNotes(response.data);
     });
   }
 
   selectNote(id) {
-    const curr = this.findNote(this.state.notes, id)[0];
-    this.setState({ current: curr });
+    const curr = this.findNote(this.props.items, id)[0];
+    this.props.selectNote(curr);
   }
-
+// move this into actions?
   findNote(notes, id) {
     return notes.filter(note => note.id === id);
   }
 
   newNoteView() {
-    this.setState({ current: null });
+    this.props.newNoteView();
   }
 
   deleteNote(id) {
-    axios.delete(`http://localhost:3001/notes/${id}`)
-    .then(() => {
-      this.getNotes(null);
-    });
+    this.props.deleteNote(`http://localhost:3001/notes/${id}`);
   }
 
   render() {
@@ -88,9 +73,9 @@ class App extends React.Component {
         <Note
           updateNote={this.updateNote}
           newNoteView={this.newNoteView}
-          note={this.state.current}
           newNote={this.newNote}
           deleteNote={this.deleteNote}
+          note={this.props.current}
         />
       </div>
     );
@@ -99,9 +84,15 @@ class App extends React.Component {
 
 App.propTypes = {
   fetchData: PropTypes.func.isRequired,
+  selectNote: PropTypes.func.isRequired,
+  newNoteView: PropTypes.func.isRequired,
+  updateNote: PropTypes.func.isRequired,
+  deleteNote: PropTypes.func.isRequired,
+  postNewNote: PropTypes.func.isRequired,
   items: PropTypes.array.isRequired,
   hasErrored: PropTypes.bool.isRequired,
   isLoading: PropTypes.bool.isRequired,
+  current: PropTypes.any.isRequired,
 };
 
 const mapStateToProps = (state) => {
@@ -109,12 +100,18 @@ const mapStateToProps = (state) => {
     items: state.items,
     hasErrored: state.itemsHasErrored,
     isLoading: state.itemsIsLoading,
+    current: state.selectNote,
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
     fetchData: url => dispatch(itemsFetchData(url)),
+    selectNote: noteId => dispatch(selectNote(noteId)),
+    newNoteView: () => dispatch(newNoteView()),
+    postNewNote: (url, data) => dispatch(postNewNote(url, data)),
+    updateNote: (url, data) => dispatch(updateNote(url, data)),
+    deleteNote: url => dispatch(deleteNote(url)),
   };
 };
 
