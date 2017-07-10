@@ -13,7 +13,9 @@ app.use(express.static(__dirname));
 const Note = require('./db');
 
 app.post('/notes', (req, res) => {
-  Note.create({ data: req.body.data, title: req.body.title }).then((note) => { res.json(note); });
+  Note.create({ data: req.body.data, title: req.body.title }).then((err, note) => {
+    res.json(note);
+  });
 });
 
 app.get('/notes', (req, res) => {
@@ -31,12 +33,14 @@ app.get('/notes', (req, res) => {
     query.where = { id: { $gte: req.params.start } };
   }
 
-  Note.findAll(query).then((notes) => { res.json(notes); });
+  Note.findAll(query).then((notes) => {
+    res.json(notes);
+  });
 });
 
 app.get('/notes/:id', (req, res) => {
   const id = req.params.id;
-  Note.findById(id).then((note) => {
+  Note.findById(id).then((err, note) => {
     res.json(note);
   });
 });
@@ -45,16 +49,16 @@ app.put('/notes/:id', (req, res) => {
   Note.update({ data: req.body.data, title: req.body.title }, { where: { id: req.params.id } })
   .then(() => {
     Note.findById(req.params.id)
-    .then((note) => {
+    .then((err, note) => {
       res.json(note);
     });
   });
 });
 
 app.delete('/notes/:id', (req, res) => {
-  Note.destroy({ where: { id: req.params.id }})
-  .then(() => {
-    res.end();
+  Note.destroy({ where: { id: req.params.id } })
+  .then((err, note) => {
+    res.end(note);
   });
 });
 

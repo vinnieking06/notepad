@@ -1,11 +1,16 @@
 /* eslint class-methods-use-this: 0*/
-import React from 'react';
+/* eslint react/forbid-prop-types: 0 */
+/* eslint arrow-body-style: 0 */
+
+import React, { PropTypes } from 'react';
+import { connect } from 'react-redux';
 import axios from 'axios';
+import { itemsFetchData } from './../redux/actions';
 import './../App.css';
 import List from './List';
 import Note from './Note';
 
-export default class App extends React.Component {
+class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = { notes: [], current: null };
@@ -21,11 +26,12 @@ export default class App extends React.Component {
     this.getNotes();
   }
 
-  getNotes(currentNote) {
-    axios.get('http://localhost:3001/notes')
-    .then((data) => {
-      this.setState({ notes: data.data, current: currentNote });
-    });
+  // getNotes(currentNote) {
+  getNotes() {
+    this.props.fetchData('http://localhost:3001/notes');
+    // .then((data) => {
+    //   this.setState({ notes: data.data, current: currentNote });
+    // });
   }
 
   newNote(input) {
@@ -69,9 +75,16 @@ export default class App extends React.Component {
   }
 
   render() {
+    if (this.props.hasErrored) {
+      return <p>Sorry! There was an error loading the items</p>;
+    }
+
+    if (this.props.isLoading) {
+      return <p>Loading…</p>;
+    }
     return (
       <div>
-        <List deleteNote={this.deleteNote} selectNote={this.selectNote} notes={this.state.notes} />
+        <List deleteNote={this.deleteNote} selectNote={this.selectNote} notes={this.props.items} />
         <Note
           updateNote={this.updateNote}
           newNoteView={this.newNoteView}
@@ -83,3 +96,28 @@ export default class App extends React.Component {
     );
   }
 }
+
+App.propTypes = {
+  fetchData: PropTypes.func.isRequired,
+  items: PropTypes.array.isRequired,
+  hasErrored: PropTypes.bool.isRequired,
+  isLoading: PropTypes.bool.isRequired,
+};
+
+const mapStateToProps = (state) => {
+  return {
+    items: state.items,
+    hasErrored: state.itemsHasErrored,
+    isLoading: state.itemsIsLoading,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    fetchData: url => dispatch(itemsFetchData(url)),
+  };
+};
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
+
