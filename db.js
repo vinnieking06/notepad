@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 
-const sequelize = new Sequelize('postgres://vincentking:ilovetesting@localhost:5432/notepad');
-// const sequelize = new Sequelize('postgres://fkdyrlsr:JzhorQXQH_LpYcX30-1LWHvZvPFuqvRX@elmer.db.elephantsql.com:5432/fkdyrlsr')
+//const sequelize = new Sequelize('postgres://vincentking:ilovetesting@localhost:5432/notepad');
+const sequelize = new Sequelize('postgres://fkdyrlsr:JzhorQXQH_LpYcX30-1LWHvZvPFuqvRX@elmer.db.elephantsql.com:5432/fkdyrlsr');
 
 sequelize
   .authenticate()
