@@ -27,7 +27,7 @@ class App extends React.Component {
   }
 
   getNotes() {
-    this.props.fetchData('http://localhost:3001/notes');
+    this.props.fetchData('/notes');
   }
 
   newNote(input) {
