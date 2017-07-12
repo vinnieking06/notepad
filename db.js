@@ -20,7 +20,7 @@ const Note = sequelize.define('note', {
     type: Sequelize.STRING,
   },
 });
-// Note.sync({force: true}).then(function () {
-//   console.log("Created Notes Table")
-// });
+Note.sync({force: true}).then(function () {
+  console.log("Created Notes Table")
+});
 module.exports = Note;
