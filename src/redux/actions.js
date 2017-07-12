@@ -71,7 +71,7 @@ export function postNewNote(url, data) {
           dispatch(itemsIsLoading(false));
           return response;
         })
-            .then(response => dispatch(itemsFetchData('http://localhost:3001/notes', response)))
+            .then(response => dispatch(itemsFetchData('/notes', response)))
             .catch(() => dispatch(itemsHasErrored(true)));
   };
 }
@@ -88,7 +88,7 @@ export function updateNote(url, data) {
           dispatch(itemsIsLoading(false));
           return response;
         })
-            .then(response => dispatch(itemsFetchData('http://localhost:3001/notes', response)))
+            .then(response => dispatch(itemsFetchData('/notes', response)))
             .catch(() => dispatch(itemsHasErrored(true)));
   };
 }
@@ -105,7 +105,7 @@ export function deleteNote(url) {
           dispatch(itemsIsLoading(false));
           return response;
         })
-            .then(() => dispatch(itemsFetchData('http://localhost:3001/notes', {})))
+            .then(() => dispatch(itemsFetchData('/notes', {})))
             .catch(() => dispatch(itemsHasErrored(true)));
   };
 }

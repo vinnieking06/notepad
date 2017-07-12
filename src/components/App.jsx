@@ -31,14 +31,14 @@ class App extends React.Component {
   }
 
   newNote(input) {
-    this.props.postNewNote('http://localhost:3001/notes', {
+    this.props.postNewNote('/notes', {
       data: input.note,
       title: input.title,
     });
   }
 
   updateNote(input) {
-    this.props.updateNote(`http://localhost:3001/notes/${input.id}`, {
+    this.props.updateNote(`/notes/${input.id}`, {
       data: input.note,
       title: input.title,
     });
@@ -58,7 +58,7 @@ class App extends React.Component {
   }
 
   deleteNote(id) {
-    this.props.deleteNote(`http://localhost:3001/notes/${id}`);
+    this.props.deleteNote(`/notes/${id}`);
   }
 
   render() {

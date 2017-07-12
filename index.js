@@ -26193,7 +26193,7 @@ var App = function (_React$Component) {
   }, {
     key: 'newNote',
     value: function newNote(input) {
-      this.props.postNewNote('http://localhost:3001/notes', {
+      this.props.postNewNote('/notes', {
         data: input.note,
         title: input.title
       });
@@ -26201,7 +26201,7 @@ var App = function (_React$Component) {
   }, {
     key: 'updateNote',
     value: function updateNote(input) {
-      this.props.updateNote('http://localhost:3001/notes/' + input.id, {
+      this.props.updateNote('/notes/' + input.id, {
         data: input.note,
         title: input.title
       });
@@ -26229,7 +26229,7 @@ var App = function (_React$Component) {
   }, {
     key: 'deleteNote',
     value: function deleteNote(id) {
-      this.props.deleteNote('http://localhost:3001/notes/' + id);
+      this.props.deleteNote('/notes/' + id);
     }
   }, {
     key: 'render',
@@ -26418,7 +26418,7 @@ function postNewNote(url, data) {
       dispatch(itemsIsLoading(false));
       return response;
     }).then(function (response) {
-      return dispatch(itemsFetchData('http://localhost:3001/notes', response));
+      return dispatch(itemsFetchData('/notes', response));
     }).catch(function () {
       return dispatch(itemsHasErrored(true));
     });
@@ -26436,7 +26436,7 @@ function updateNote(url, data) {
       dispatch(itemsIsLoading(false));
       return response;
     }).then(function (response) {
-      return dispatch(itemsFetchData('http://localhost:3001/notes', response));
+      return dispatch(itemsFetchData('/notes', response));
     }).catch(function () {
       return dispatch(itemsHasErrored(true));
     });
@@ -26454,7 +26454,7 @@ function deleteNote(url) {
       dispatch(itemsIsLoading(false));
       return response;
     }).then(function () {
-      return dispatch(itemsFetchData('http://localhost:3001/notes', {}));
+      return dispatch(itemsFetchData('/notes', {}));
     }).catch(function () {
       return dispatch(itemsHasErrored(true));
     });
