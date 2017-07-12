@@ -1,5 +1,6 @@
 /* eslint react/prop-types: 0 */
 import React from 'react';
+import './Load.scss';
 
 const List = (props) => {
   const notesList = [];
@@ -13,7 +14,8 @@ const List = (props) => {
     });
   }
   return (
-    <div>
+    <div id="listContainer">
+      <h3> All Notes</h3>
       {notesList}
     </div>
   );

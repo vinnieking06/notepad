@@ -5,9 +5,11 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { itemsFetchData, selectNote, newNoteView, postNewNote, updateNote, deleteNote } from './../redux/actions';
-import './../App.css';
+import './../App.scss';
 import List from './List';
 import Note from './Note';
+import Load from './Load';
+import Top from './Top';
 
 class App extends React.Component {
   constructor(props) {
@@ -65,18 +67,25 @@ class App extends React.Component {
     }
 
     if (this.props.isLoading) {
-      return <p>Loading…</p>;
+      return <Load />;
     }
     return (
-      <div>
-        <List deleteNote={this.deleteNote} selectNote={this.selectNote} notes={this.props.items} />
-        <Note
-          updateNote={this.updateNote}
-          newNoteView={this.newNoteView}
-          newNote={this.newNote}
-          deleteNote={this.deleteNote}
-          note={this.props.current}
-        />
+      <div id="app">
+        <Top />
+        <div id="list-note">
+          <List
+            deleteNote={this.deleteNote}
+            selectNote={this.selectNote}
+            notes={this.props.items}
+          />
+          <Note
+            updateNote={this.updateNote}
+            newNoteView={this.newNoteView}
+            newNote={this.newNote}
+            deleteNote={this.deleteNote}
+            note={this.props.current}
+          />
+        </div>
       </div>
     );
   }
