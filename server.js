@@ -63,8 +63,4 @@ app.delete('/notes/:id', (req, res) => {
   });
 });
 
-const port = process.env.port || 3000;
-
-app.listen((process.env.PORT || 3000), () => {
-  console.log('server running');
-});
+app.listen(process.env.PORT || 5000);
