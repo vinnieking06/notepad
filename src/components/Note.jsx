@@ -45,7 +45,7 @@ export default class Note extends React.Component {
   render() {
     if (this.props.note.id) {
       return (
-        <div>
+        <div className="noteContainer">
           Title <input value={this.state.title} onChange={this.handleTitle} /> <br />
           Note <textarea value={this.state.note} onChange={this.handleNote} />
           <button onClick={() => { this.handleUpdate(); }}> save </button>
@@ -55,7 +55,7 @@ export default class Note extends React.Component {
       );
     }
     return (
-      <div>
+      <div className="noteContainer" >
            Title <input
              value={this.state.title}
              onChange={this.handleTitle}

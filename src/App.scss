@@ -1,0 +1,49 @@
+#app {
+}
+
+li {
+    list-style-type: none;
+  }
+
+h3 { margin-top: 0; }
+
+.TopContainer {
+  background-color: red;
+  text-align: center;
+  height: 100px
+}
+
+#listContainer {
+  width: 200px;
+  text-align: center
+}
+
+#list-note {
+  height: 705px;
+  background-color: yellow;
+  display: flex;
+  flex-direction: row;
+}
+
+.noteContainer {
+  input {
+    width: 40%;
+  }
+  button {
+    width: 20%
+  }
+  textarea {
+    width: 90%;
+    height: 80%;
+  }
+  flex: 1;
+  display: flex;
+  background-color: green;
+  flex-direction: column;
+  align-items: center
+}
+
+@keyframes App-logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
