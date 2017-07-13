@@ -46,21 +46,35 @@ export default class Note extends React.Component {
     if (this.props.note.id) {
       return (
         <div className="noteContainer">
-          Title <input value={this.state.title} onChange={this.handleTitle} /> <br />
-          Note <textarea value={this.state.note} onChange={this.handleNote} />
-          <button onClick={() => { this.handleUpdate(); }}> save </button>
-          <button onClick={this.props.newNoteView}> new note </button>
-          <button onClick={() => { this.props.deleteNote(this.state.id); }}> Delete </button>
+          <input
+            placeholder="title"
+            maxLength="10"
+            value={this.state.title}
+            onChange={this.handleTitle}
+          /> <br />
+          <textarea className="notebook" value={this.state.note} onChange={this.handleNote} />
+          <div>
+            <button onClick={() => { this.handleUpdate(); }}> save </button>
+            <button onClick={this.props.newNoteView}> new note </button>
+            <button onClick={() => { this.props.deleteNote(this.state.id); }}> Delete </button>
+          </div>
         </div>
       );
     }
     return (
       <div className="noteContainer" >
-           Title <input
-             value={this.state.title}
-             onChange={this.handleTitle}
-           /> <br />
-            Note <textarea value={this.state.note} onChange={this.handleNote} />
+        <input
+          placeholder="title"
+          maxLength="10"
+          value={this.state.title}
+          onChange={this.handleTitle}
+        /> <br />
+        <textarea
+          className="notebook"
+          placeholder="Type note here"
+          value={this.state.note}
+          onChange={this.handleNote}
+        />
         <button onClick={this.handleSubmit}> save </button>
       </div>
     );

@@ -7,10 +7,10 @@ const List = (props) => {
   // configure lifecycle for below
   if (props.notes.length) {
     props.notes.forEach((note) => {
-      notesList.push(<li key={note.id} >{note.title}
-        <button onClick={() => { props.selectNote(note.id); }}> select </button>
+      notesList.push(<div className="note" key={note.id} onClick={() => { props.selectNote(note.id); }} >
+        <span>{note.title}</span>
         <button onClick={() => { props.deleteNote(note.id); }}> Delete </button>
-      </li>);
+      </div>);
     });
   }
   return (

@@ -27375,7 +27375,7 @@ exports = module.exports = __webpack_require__(55)(undefined);
 
 
 // module
-exports.push([module.i, "li {\n  list-style-type: none; }\n\nh3 {\n  margin-top: 0; }\n\n.TopContainer {\n  background-color: red;\n  text-align: center;\n  height: 100px; }\n\n#listContainer {\n  width: 200px;\n  text-align: center; }\n\n#list-note {\n  height: 705px;\n  background-color: yellow;\n  display: flex;\n  flex-direction: row; }\n\n.noteContainer {\n  flex: 1;\n  display: flex;\n  background-color: green;\n  flex-direction: column;\n  align-items: center; }\n  .noteContainer input {\n    width: 40%; }\n  .noteContainer button {\n    width: 20%; }\n  .noteContainer textarea {\n    width: 90%;\n    height: 80%; }\n\n@keyframes App-logo-spin {\n  from {\n    transform: rotate(0deg); }\n  to {\n    transform: rotate(360deg); } }\n", ""]);
+exports.push([module.i, "button {\n  background-color: #FC4A1A;\n  margin: 2px;\n  -moz-border-radius: 28px;\n  -webkit-border-radius: 28px;\n  border-radius: 28px;\n  border: 1px solid #FC4A1A;\n  display: inline-block;\n  cursor: pointer;\n  color: #ffffff;\n  font-family: Arial;\n  padding: 10px 10px;\n  text-decoration: none;\n  text-shadow: 0px 1px 0px #FC4A1A; }\n\nbutton:hover {\n  background-color: #4ABDAC;\n  border: 1px solid #4ABDAC; }\n\nbutton:active {\n  position: relative;\n  top: 1px; }\n\nbutton:focus {\n  outline: 0; }\n\nli {\n  list-style-type: none; }\n\nh3 {\n  margin-top: 0;\n  padding-top: 15px; }\n\n.TopContainer {\n  background-color: #4ABDAC;\n  text-align: center;\n  height: 100px;\n  color: white; }\n\n#listContainer {\n  width: 30%;\n  text-align: center; }\n  #listContainer .note {\n    background-color: #DFDCE3;\n    margin: auto;\n    border-radius: 10px;\n    margin: 2px;\n    display: flex;\n    flex-direction: row;\n    justify-content: space-around; }\n    #listContainer .note span {\n      margin: auto; }\n    #listContainer .note button:hover {\n      background-color: red;\n      border: 1px solid red; }\n  #listContainer .note:hover {\n    background-color: #4ABDAC;\n    border: 1px solid #4ABDAC;\n    cursor: pointer;\n    cursor: hand; }\n  #listContainer .note:active {\n    position: relative;\n    top: 1px; }\n\n#list-note {\n  height: 705px;\n  display: flex;\n  flex-direction: row; }\n\n.noteContainer {\n  flex: 1;\n  display: flex;\n  flex-direction: column;\n  align-items: center; }\n  .noteContainer input {\n    box-sizing: border-box;\n    -webkit-box-sizing: border-box;\n    -moz-box-sizing: border-box;\n    outline: none;\n    display: block;\n    width: 100%;\n    padding: 7px;\n    border: none;\n    border-bottom: 1px solid #ddd;\n    background: transparent;\n    margin-bottom: 10px;\n    font: 16px Arial, Helvetica, sans-serif;\n    height: 45px; }\n\n@keyframes App-logo-spin {\n  from {\n    transform: rotate(0deg); }\n  to {\n    transform: rotate(360deg); } }\n\n.notebook {\n  background: url(\"http://bookofzeus.com/download/notebook.png\") repeat-y;\n  width: 600px;\n  height: 300px;\n  font: normal 14px verdana;\n  line-height: 25px;\n  padding: 2px 10px;\n  border: solid 1px #ddd; }\n", ""]);
 
 // exports
 
@@ -27406,15 +27406,14 @@ var List = function List(props) {
   if (props.notes.length) {
     props.notes.forEach(function (note) {
       notesList.push(_react2.default.createElement(
-        'li',
-        { key: note.id },
-        note.title,
+        'div',
+        { className: 'note', key: note.id, onClick: function onClick() {
+            props.selectNote(note.id);
+          } },
         _react2.default.createElement(
-          'button',
-          { onClick: function onClick() {
-              props.selectNote(note.id);
-            } },
-          ' select '
+          'span',
+          null,
+          note.title
         ),
         _react2.default.createElement(
           'button',
@@ -27570,45 +27569,57 @@ var Note = function (_React$Component) {
         return _react2.default.createElement(
           'div',
           { className: 'noteContainer' },
-          'Title ',
-          _react2.default.createElement('input', { value: this.state.title, onChange: this.handleTitle }),
+          _react2.default.createElement('input', {
+            placeholder: 'title',
+            maxLength: '10',
+            value: this.state.title,
+            onChange: this.handleTitle
+          }),
           ' ',
           _react2.default.createElement('br', null),
-          'Note ',
-          _react2.default.createElement('textarea', { value: this.state.note, onChange: this.handleNote }),
+          _react2.default.createElement('textarea', { className: 'notebook', value: this.state.note, onChange: this.handleNote }),
           _react2.default.createElement(
-            'button',
-            { onClick: function onClick() {
-                _this2.handleUpdate();
-              } },
-            ' save '
-          ),
-          _react2.default.createElement(
-            'button',
-            { onClick: this.props.newNoteView },
-            ' new note '
-          ),
-          _react2.default.createElement(
-            'button',
-            { onClick: function onClick() {
-                _this2.props.deleteNote(_this2.state.id);
-              } },
-            ' Delete '
+            'div',
+            null,
+            _react2.default.createElement(
+              'button',
+              { onClick: function onClick() {
+                  _this2.handleUpdate();
+                } },
+              ' save '
+            ),
+            _react2.default.createElement(
+              'button',
+              { onClick: this.props.newNoteView },
+              ' new note '
+            ),
+            _react2.default.createElement(
+              'button',
+              { onClick: function onClick() {
+                  _this2.props.deleteNote(_this2.state.id);
+                } },
+              ' Delete '
+            )
           )
         );
       }
       return _react2.default.createElement(
         'div',
         { className: 'noteContainer' },
-        'Title ',
         _react2.default.createElement('input', {
+          placeholder: 'title',
+          maxLength: '10',
           value: this.state.title,
           onChange: this.handleTitle
         }),
         ' ',
         _react2.default.createElement('br', null),
-        'Note ',
-        _react2.default.createElement('textarea', { value: this.state.note, onChange: this.handleNote }),
+        _react2.default.createElement('textarea', {
+          className: 'notebook',
+          placeholder: 'Type note here',
+          value: this.state.note,
+          onChange: this.handleNote
+        }),
         _react2.default.createElement(
           'button',
           { onClick: this.handleSubmit },
@@ -27684,9 +27695,9 @@ var Top = function Top() {
       "NotePad"
     ),
     _react2.default.createElement(
-      "h5",
+      "p",
       null,
-      "Create, save or delete. Enjoy!"
+      "A place to to write about your memories, passions and goals."
     )
   );
 };
