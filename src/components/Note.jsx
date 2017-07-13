@@ -48,7 +48,7 @@ export default class Note extends React.Component {
         <div className="noteContainer">
           <input
             placeholder="title"
-            maxLength="10"
+            maxLength="20"
             value={this.state.title}
             onChange={this.handleTitle}
           /> <br />
@@ -65,7 +65,7 @@ export default class Note extends React.Component {
       <div className="noteContainer" >
         <input
           placeholder="title"
-          maxLength="10"
+          maxLength="20"
           value={this.state.title}
           onChange={this.handleTitle}
         /> <br />
