@@ -4,10 +4,14 @@ import './Load.scss';
 
 const List = (props) => {
   const notesList = [];
-  // configure lifecycle for below
   if (props.notes.length) {
     props.notes.forEach((note) => {
-      notesList.push(<div className="note" key={note.id} onClick={() => { props.selectNote(note.id); }} >
+      notesList.push(
+      <div
+        className="note"
+        key={note.id}
+        onClick={() => { props.selectNote(note.id); }}
+      >
         <span>{note.title}</span>
         <button onClick={() => { props.deleteNote(note.id); }}> Delete </button>
       </div>);

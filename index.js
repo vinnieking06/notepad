@@ -27402,14 +27402,17 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /* eslint react/prop-types: 0 */
 var List = function List(props) {
   var notesList = [];
-  // configure lifecycle for below
   if (props.notes.length) {
     props.notes.forEach(function (note) {
       notesList.push(_react2.default.createElement(
         'div',
-        { className: 'note', key: note.id, onClick: function onClick() {
+        {
+          className: 'note',
+          key: note.id,
+          onClick: function onClick() {
             props.selectNote(note.id);
-          } },
+          }
+        },
         _react2.default.createElement(
           'span',
           null,
@@ -27571,7 +27574,7 @@ var Note = function (_React$Component) {
           { className: 'noteContainer' },
           _react2.default.createElement('input', {
             placeholder: 'title',
-            maxLength: '10',
+            maxLength: '20',
             value: this.state.title,
             onChange: this.handleTitle
           }),
@@ -27608,7 +27611,7 @@ var Note = function (_React$Component) {
         { className: 'noteContainer' },
         _react2.default.createElement('input', {
           placeholder: 'title',
-          maxLength: '10',
+          maxLength: '20',
           value: this.state.title,
           onChange: this.handleTitle
         }),
