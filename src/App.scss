@@ -1,49 +1,125 @@
+$blue: #4ABDAC;
+$orange: #FC4A1A;
+$yellow: #f7b733;
+$grey: #DFDCE3;
+
 #app {
 }
+
+button {
+	background-color: $orange;
+  margin: 2px;
+	-moz-border-radius:28px;
+	-webkit-border-radius:28px;
+	border-radius:28px;
+	border:1px solid $orange;
+	display:inline-block;
+	cursor:pointer;
+	color:#ffffff;
+	font-family:Arial;
+	padding:10px 10px;
+	text-decoration:none;
+	text-shadow:0px 1px 0px $orange
+}
+button:hover {
+	background-color:$blue;
+  border:1px solid $blue
+}
+button:active {
+	position:relative;
+	top:1px;
+}
+
+button:focus {outline:0;}
 
 li {
     list-style-type: none;
   }
 
-h3 { margin-top: 0; }
+h3 { margin-top: 0; 
+    padding-top: 15px;
+   } 
 
 .TopContainer {
-  background-color: red;
+  background-color: $blue;
   text-align: center;
-  height: 100px
+  height: 100px;
+  color: white
 }
 
 #listContainer {
-  width: 200px;
+   .note {
+      span {
+        margin: auto
+      }
+      button:hover {
+        background-color: red;
+        border:1px solid red;
+      }
+
+      background-color: $grey;
+      margin: auto;
+      border-radius: 10px;
+      margin: 2px;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-around
+  }
+
+
+  .note:hover {
+    background-color:$blue;
+    border:1px solid $blue;
+    cursor: pointer; cursor: hand;
+}
+.note:active {
+	position:relative;
+	top:1px;
+}
+
+  width: 30%;
   text-align: center
 }
 
 #list-note {
   height: 705px;
-  background-color: yellow;
   display: flex;
   flex-direction: row;
 }
 
 .noteContainer {
   input {
-    width: 40%;
-  }
-  button {
-    width: 20%
-  }
-  textarea {
-    width: 90%;
-    height: 80%;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    outline: none;
+    display: block;
+    width: 100%;
+    padding: 7px;
+    border: none;
+    border-bottom: 1px solid #ddd;
+    background: transparent;
+    margin-bottom: 10px;
+    font: 16px Arial, Helvetica, sans-serif;
+    height: 45px;
   }
   flex: 1;
   display: flex;
-  background-color: green;
   flex-direction: column;
-  align-items: center
+  align-items: center;
 }
 
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+.notebook {
+  background: url("http://bookofzeus.com/download/notebook.png") repeat-y;
+  width: 600px;
+  height: 300px;
+  font: normal 14px verdana;
+  line-height: 25px;
+  padding: 2px 10px;
+  border: solid 1px #ddd;
 }

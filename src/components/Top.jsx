@@ -3,7 +3,7 @@ import React from 'react';
 const Top = () => (
   <div className="TopContainer">
     <h3>NotePad</h3>
-    <h5>Create, save or delete. Enjoy!</h5>
+    <p>A place to to write about your memories, passions and goals.</p>
   </div>
 );
 
