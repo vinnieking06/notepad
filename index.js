@@ -26188,7 +26188,7 @@ var App = function (_React$Component) {
   }, {
     key: 'getNotes',
     value: function getNotes() {
-      this.props.fetchData('/notes');
+      this.props.fetchData('/notes', {}, true);
     }
   }, {
     key: 'newNote',
@@ -26296,8 +26296,8 @@ var mapStateToProps = function mapStateToProps(state) {
 
 var mapDispatchToProps = function mapDispatchToProps(dispatch) {
   return {
-    fetchData: function fetchData(url) {
-      return dispatch((0, _actions.itemsFetchData)(url));
+    fetchData: function fetchData(url, current, initial) {
+      return dispatch((0, _actions.itemsFetchData)(url, current, initial));
     },
     selectNote: function selectNote(noteId) {
       return dispatch((0, _actions.selectNote)(noteId));
@@ -26382,9 +26382,11 @@ function newNoteView() {
   };
 }
 
-function itemsFetchData(url, current) {
+function itemsFetchData(url, current, initial) {
   return function (dispatch) {
-    dispatch(itemsIsLoading(true));
+    if (initial === true) {
+      dispatch(itemsIsLoading(true));
+    }
     (0, _axios2.default)(url).then(function (response) {
       if (!response.status === 200) {
         throw Error(response.statusText);
@@ -26409,13 +26411,10 @@ function itemsFetchData(url, current) {
 
 function postNewNote(url, data) {
   return function (dispatch) {
-    dispatch(itemsIsLoading(true));
     _axios2.default.post(url, data).then(function (response) {
       if (!response.status === 200) {
         throw Error(response.statusText);
       }
-
-      dispatch(itemsIsLoading(false));
       return response;
     }).then(function (response) {
       return dispatch(itemsFetchData('/notes', response));
@@ -26427,13 +26426,10 @@ function postNewNote(url, data) {
 
 function updateNote(url, data) {
   return function (dispatch) {
-    dispatch(itemsIsLoading(true));
     _axios2.default.put(url, data).then(function (response) {
       if (!response.status === 200) {
         throw Error(response.statusText);
       }
-
-      dispatch(itemsIsLoading(false));
       return response;
     }).then(function (response) {
       return dispatch(itemsFetchData('/notes', response));
@@ -26445,13 +26441,10 @@ function updateNote(url, data) {
 
 function deleteNote(url) {
   return function (dispatch) {
-    dispatch(itemsIsLoading(true));
     _axios2.default.delete(url).then(function (response) {
       if (!response.status === 200) {
         throw Error(response.statusText);
       }
-
-      dispatch(itemsIsLoading(false));
       return response;
     }).then(function () {
       return dispatch(itemsFetchData('/notes', {}));

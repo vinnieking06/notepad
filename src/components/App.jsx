@@ -27,7 +27,7 @@ class App extends React.Component {
   }
 
   getNotes() {
-    this.props.fetchData('/notes');
+    this.props.fetchData('/notes', {}, true);
   }
 
   newNote(input) {
@@ -115,7 +115,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    fetchData: url => dispatch(itemsFetchData(url)),
+    fetchData: (url, current, initial) => dispatch(itemsFetchData(url, current, initial)),
     selectNote: noteId => dispatch(selectNote(noteId)),
     newNoteView: () => dispatch(newNoteView()),
     postNewNote: (url, data) => dispatch(postNewNote(url, data)),

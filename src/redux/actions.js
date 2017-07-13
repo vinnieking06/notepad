@@ -35,9 +35,11 @@ export function newNoteView() {
   };
 }
 
-export function itemsFetchData(url, current) {
+export function itemsFetchData(url, current, initial) {
   return (dispatch) => {
-    dispatch(itemsIsLoading(true));
+    if (initial === true) {
+      dispatch(itemsIsLoading(true));
+    }
     axios(url)
         .then((response) => {
           if (!response.status === 200) {
@@ -61,14 +63,11 @@ export function itemsFetchData(url, current) {
 
 export function postNewNote(url, data) {
   return (dispatch) => {
-    dispatch(itemsIsLoading(true));
     axios.post(url, data)
         .then((response) => {
           if (!response.status === 200) {
             throw Error(response.statusText);
           }
-
-          dispatch(itemsIsLoading(false));
           return response;
         })
             .then(response => dispatch(itemsFetchData('/notes', response)))
@@ -78,14 +77,11 @@ export function postNewNote(url, data) {
 
 export function updateNote(url, data) {
   return (dispatch) => {
-    dispatch(itemsIsLoading(true));
     axios.put(url, data)
         .then((response) => {
           if (!response.status === 200) {
             throw Error(response.statusText);
           }
-
-          dispatch(itemsIsLoading(false));
           return response;
         })
             .then(response => dispatch(itemsFetchData('/notes', response)))
@@ -95,14 +91,11 @@ export function updateNote(url, data) {
 
 export function deleteNote(url) {
   return (dispatch) => {
-    dispatch(itemsIsLoading(true));
     axios.delete(url)
         .then((response) => {
           if (!response.status === 200) {
             throw Error(response.statusText);
           }
-
-          dispatch(itemsIsLoading(false));
           return response;
         })
             .then(() => dispatch(itemsFetchData('/notes', {})))
