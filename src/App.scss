@@ -3,9 +3,6 @@ $orange: #FC4A1A;
 $yellow: #f7b733;
 $grey: #DFDCE3;
 
-#app {
-}
-
 button {
 	background-color: $orange;
   margin: 2px;
@@ -34,7 +31,7 @@ button:focus {outline:0;}
 
 li {
     list-style-type: none;
-  }
+}
 
 h3 { margin-top: 0; 
     padding-top: 15px;
@@ -107,11 +104,6 @@ h3 { margin-top: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-@keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
 }
 
 .notebook {
