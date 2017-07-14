@@ -27693,7 +27693,7 @@ var Top = function Top() {
     _react2.default.createElement(
       "p",
       null,
-      "A place to to write about your memories, passions and goals."
+      "A place to write about your memories, passions and goals."
     )
   );
 };
