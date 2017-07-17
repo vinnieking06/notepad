@@ -4,6 +4,7 @@
 
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router';
 import { itemsFetchData, selectNote, newNoteView, postNewNote, updateNote, deleteNote } from './../redux/actions';
 import './../App.scss';
 import List from './List';
@@ -23,6 +24,7 @@ class App extends React.Component {
   }
 
   componentWillMount() {
+    console.log(this.props);
     this.getNotes();
   }
 
@@ -125,5 +127,6 @@ const mapDispatchToProps = (dispatch) => {
 };
 
 
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+// export default connect(mapStateToProps, mapDispatchToProps)(App);
 
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App));

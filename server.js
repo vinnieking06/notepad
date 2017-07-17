@@ -1,8 +1,13 @@
+/* eslint-disable */
+
 const express = require('express');
 
 const app = express();
 
 const bodyParser = require('body-parser');
+
+const jwt = require('express-jwt');
+const jwksRsa = require('jwks-rsa');
 
 app.use(bodyParser.urlencoded({
   extended: true,
@@ -12,6 +17,26 @@ app.use(bodyParser.json());
 
 app.use(express.static(__dirname));
 const Note = require('./db');
+
+const checkJwt = jwt({
+  // Dynamically provide a signing key based on the kid in the header and the singing keys provided by the JWKS endpoint.
+  secret: jwksRsa.expressJwtSecret({
+    cache: true,
+    rateLimit: true,
+    jwksRequestsPerMinute: 5,
+    jwksUri: `https://vinnieking06.auth0.com/.well-known/jwks.json`
+  }),
+
+  // Validate the audience and the issuer.
+  audience: 'https://vinnieking06.auth0.com/api/v2/',
+  issuer: `https://vinnieking06.auth0.com/`,
+  algorithms: ['RS256']
+});
+
+app.post('/private', checkJwt, function(req, res){
+  var timesheet = req.body;
+  res.status(201).send("hello");
+})
 
 app.post('/notes', (req, res) => {
   Note.create({ data: req.body.data, title: req.body.title }).then((note) => {
@@ -63,4 +88,8 @@ app.delete('/notes/:id', (req, res) => {
   });
 });
 
-app.listen(process.env.PORT || 5000);
+app.get('*', function(req, res){
+  res.sendfile(__dirname + '/index.html');
+})
+
+app.listen(process.env.PORT || 5000)
