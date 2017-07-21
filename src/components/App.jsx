@@ -1,10 +1,13 @@
 /* eslint class-methods-use-this: 0*/
 /* eslint react/forbid-prop-types: 0 */
 /* eslint arrow-body-style: 0 */
+/* eslint-env browser */
+
 
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
+import axios from 'axios';
 import { itemsFetchData, selectNote, newNoteView, postNewNote, updateNote, deleteNote } from './../redux/actions';
 import './../App.scss';
 import List from './List';
@@ -15,6 +18,7 @@ import Top from './Top';
 class App extends React.Component {
   constructor(props) {
     super(props);
+    this.state = { access_token: '', id: '' };
     this.newNote = this.newNote.bind(this);
     this.getNotes = this.getNotes.bind(this);
     this.selectNote = this.selectNote.bind(this);
@@ -23,13 +27,34 @@ class App extends React.Component {
     this.deleteNote = this.deleteNote.bind(this);
   }
 
-  componentWillMount() {
-    console.log(this.props);
+  async componentWillMount() {
+    await this.getAccessToken();
+    await this.getAuthId();
+    console.log(this.state);
     this.getNotes();
   }
 
+  getAccessToken() {
+    const match = RegExp('[#&]access_token=([^&]*)').exec(window.location.hash);
+    const token = match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+    this.setState({ access_token: token });
+  }
+
+  async getAuthId() {
+    let AuthId;
+    const AuthStr = 'Bearer '.concat(this.state.access_token);
+    await axios.get('https://vinnieking06.auth0.com/userinfo', { headers: { Authorization: AuthStr } })
+      .then((response) => {
+        AuthId = response.data.sub;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    this.setState({ id: AuthId });
+  }
+
   getNotes() {
-    this.props.fetchData('/notes', {}, true);
+    this.props.fetchData(`${this.state.id}/notes`, {}, true);
   }
 
   newNote(input) {

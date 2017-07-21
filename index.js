@@ -30963,6 +30963,10 @@ var _reactRedux = __webpack_require__(107);
 
 var _reactRouter = __webpack_require__(259);
 
+var _axios = __webpack_require__(281);
+
+var _axios2 = _interopRequireDefault(_axios);
+
 var _actions = __webpack_require__(280);
 
 __webpack_require__(300);
@@ -30992,6 +30996,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /* eslint class-methods-use-this: 0*/
 /* eslint react/forbid-prop-types: 0 */
 /* eslint arrow-body-style: 0 */
+/* eslint-env browser */
 
 var App = function (_React$Component) {
   _inherits(App, _React$Component);
@@ -31001,6 +31006,7 @@ var App = function (_React$Component) {
 
     var _this = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this, props));
 
+    _this.state = { access_token: '', id: '' };
     _this.newNote = _this.newNote.bind(_this);
     _this.getNotes = _this.getNotes.bind(_this);
     _this.selectNote = _this.selectNote.bind(_this);
@@ -31012,14 +31018,35 @@ var App = function (_React$Component) {
 
   _createClass(App, [{
     key: 'componentWillMount',
-    value: function componentWillMount() {
-      console.log(this.props);
+    value: async function componentWillMount() {
+      await this.getAccessToken();
+      await this.getAuthId();
+      console.log(this.state);
       this.getNotes();
+    }
+  }, {
+    key: 'getAccessToken',
+    value: function getAccessToken() {
+      var match = RegExp('[#&]access_token=([^&]*)').exec(window.location.hash);
+      var token = match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+      this.setState({ access_token: token });
+    }
+  }, {
+    key: 'getAuthId',
+    value: async function getAuthId() {
+      var AuthId = void 0;
+      var AuthStr = 'Bearer '.concat(this.state.access_token);
+      await _axios2.default.get('https://vinnieking06.auth0.com/userinfo', { headers: { Authorization: AuthStr } }).then(function (response) {
+        AuthId = response.data.sub;
+      }).catch(function (error) {
+        console.log(error);
+      });
+      this.setState({ id: AuthId });
     }
   }, {
     key: 'getNotes',
     value: function getNotes() {
-      this.props.fetchData('/notes', {}, true);
+      this.props.fetchData(this.state.id + '/notes', {}, true);
     }
   }, {
     key: 'newNote',

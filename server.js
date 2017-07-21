@@ -1,13 +1,10 @@
 /* eslint-disable */
-
 const express = require('express');
-
 const app = express();
-
 const bodyParser = require('body-parser');
-
 const jwt = require('express-jwt');
 const jwksRsa = require('jwks-rsa');
+const Models = require('./db');
 
 app.use(bodyParser.urlencoded({
   extended: true,
@@ -16,10 +13,9 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 
 app.use(express.static(__dirname));
-const Note = require('./db');
+
 
 const checkJwt = jwt({
-  // Dynamically provide a signing key based on the kid in the header and the singing keys provided by the JWKS endpoint.
   secret: jwksRsa.expressJwtSecret({
     cache: true,
     rateLimit: true,
@@ -27,26 +23,93 @@ const checkJwt = jwt({
     jwksUri: `https://vinnieking06.auth0.com/.well-known/jwks.json`
   }),
 
-  // Validate the audience and the issuer.
   audience: 'https://vinnieking06.auth0.com/api/v2/',
   issuer: `https://vinnieking06.auth0.com/`,
   algorithms: ['RS256']
 });
 
-app.post('/private', checkJwt, function(req, res){
-  var timesheet = req.body;
-  res.status(201).send("hello");
+app.get('/:user/init', checkJwt, (req, res) => {
+  Models.User.find({ where: {id: req.params.user }})
+    .then((user) => {
+      if (user) {
+        getNotes(req, res)
+          .then((notes) => {
+            res.json(notes)
+          })
+          .catch(() => {
+            res.send('Error getting notes!')
+          })
+      } else {
+          createUser(req.params.id)
+            .then((user) => {
+              res.json('New User created')
+            })
+      }
+    })
+    .catch(() => {
+      res.send('Error finding user')
+    })
 })
 
-app.post('/notes', (req, res) => {
-  Note.create({ data: req.body.data, title: req.body.title }).then((note) => {
+app.post('/user/:id', checkJwt, (req, res) => {
+  createUser(req.params.id)
+    .then((user) => {
+      res.json(user)
+    })
+    .catch(() => {
+      res.send('Error creating Account')
+    })
+})
+
+app.post('/:user/notes', checkJwt, (req, res) => {
+  Models.Note.create({ userId: req.params.user, data: req.body.data, title: req.body.title }).then((note) => {
     res.json(note);
   });
 });
 
-app.get('/notes', (req, res) => {
-  const query = { order: [['updatedAt', 'DESC']], where: { id: { $gte: 1 } } };
+app.get('/:user/notes/', checkJwt, (req, res) => {
+    getNotes(req, res).then((notes) => {
+      res.json(notes);
+    })
+}) 
 
+app.get('/:user/notes/:id', checkJwt, (req, res) => {
+  Models.Note.findOne({where: {id: req.params.id, userId: req.params.user}})
+    .then((note) => {
+      res.json(note);
+    })
+    .catch(() => {
+      res.send('Error with this request')
+    })
+});
+
+app.put('/:user/notes/:id', checkJwt, (req, res) => {
+  Note.update({ data: req.body.data, title: req.body.title }, { where: { id: req.params.id, userId: req.params.user } })
+  .then(() => {
+    Note.findById(req.params.id)
+    .then((note) => {
+      res.json(note);
+    });
+  });
+});
+
+app.delete('/:user/notes/:id', checkJwt, (req, res) => {
+  Note.destroy({ where: { id: req.params.id, userId: req.params.user } })
+  .then((note) => {
+    res.end(note);
+  });
+});
+
+app.get('*', checkJwt, function(req, res) {
+  res.sendFile(__dirname + '/index.html');
+})
+
+function createUser(id) {
+  return Models.User.create({id: id})
+}
+
+function getNotes(req,res) {
+  const query = { order: [['updatedAt', 'DESC']], where: { userId: req.params.user, id: { $gte: 1 } } };
   if (req.params.limit) {
     query.limit = req.params.limit;
   }
@@ -58,38 +121,8 @@ app.get('/notes', (req, res) => {
   if (req.params.start) {
     query.where = { id: { $gte: req.params.start } };
   }
+  return Models.Note.findAll(query)
 
-  Note.findAll(query).then((notes) => {
-    res.json(notes);
-  });
-});
-
-app.get('/notes/:id', (req, res) => {
-  const id = req.params.id;
-  Note.findById(id).then((err, note) => {
-    res.json(note);
-  });
-});
-
-app.put('/notes/:id', (req, res) => {
-  Note.update({ data: req.body.data, title: req.body.title }, { where: { id: req.params.id } })
-  .then(() => {
-    Note.findById(req.params.id)
-    .then((note) => {
-      res.json(note);
-    });
-  });
-});
-
-app.delete('/notes/:id', (req, res) => {
-  Note.destroy({ where: { id: req.params.id } })
-  .then((err, note) => {
-    res.end(note);
-  });
-});
-
-app.get('*', function(req, res){
-  res.sendfile(__dirname + '/index.html');
-})
+}
 
 app.listen(process.env.PORT || 5000)
