@@ -35,12 +35,9 @@ export function newNoteView() {
   };
 }
 
-export function itemsFetchData(url, current, initial) {
+export function init(url, token) {
   return (dispatch) => {
-    if (initial === true) {
-      dispatch(itemsIsLoading(true));
-    }
-    axios(url)
+    axios(url, { headers: { Authorization: token } })
         .then((response) => {
           if (!response.status === 200) {
             throw Error(response.statusText);
@@ -50,7 +47,23 @@ export function itemsFetchData(url, current, initial) {
 
           return response;
         })
-            .then(response => response)
+            .then(items => dispatch(itemsFetchDataSuccess(items.data)))
+            .catch(() => dispatch(itemsHasErrored(true)));
+  };
+}
+
+export function itemsFetchData(url, current, token) {
+  return (dispatch) => {
+    axios(url, { headers: { Authorization: token } })
+        .then((response) => {
+          if (!response.status === 200) {
+            throw Error(response.statusText);
+          }
+
+          dispatch(itemsIsLoading(false));
+
+          return response;
+        })
             .then(items => dispatch(itemsFetchDataSuccess(items.data)))
             .then(() => {
               if (current) {
@@ -61,44 +74,44 @@ export function itemsFetchData(url, current, initial) {
   };
 }
 
-export function postNewNote(url, data) {
+export function postNewNote(url, data, token) {
   return (dispatch) => {
-    axios.post(url, data)
+    axios.post(url, data, { headers: { Authorization: token } })
         .then((response) => {
           if (!response.status === 200) {
             throw Error(response.statusText);
           }
           return response;
         })
-            .then(response => dispatch(itemsFetchData('/notes', response)))
+            .then(response => dispatch(itemsFetchData(url, response, token)))
             .catch(() => dispatch(itemsHasErrored(true)));
   };
 }
 
-export function updateNote(url, data) {
+export function updateNote(url, data, token, id) {
   return (dispatch) => {
-    axios.put(url, data)
+    axios.put(url, data, { headers: { Authorization: token } })
         .then((response) => {
           if (!response.status === 200) {
             throw Error(response.statusText);
           }
           return response;
         })
-            .then(response => dispatch(itemsFetchData('/notes', response)))
+            .then(response => dispatch(itemsFetchData(`/${id}/notes`, response, token)))
             .catch(() => dispatch(itemsHasErrored(true)));
   };
 }
 
-export function deleteNote(url) {
+export function deleteNote(url, token, id) {
   return (dispatch) => {
-    axios.delete(url)
+    axios.delete(url, { headers: { Authorization: token } })
         .then((response) => {
           if (!response.status === 200) {
             throw Error(response.statusText);
           }
           return response;
         })
-            .then(() => dispatch(itemsFetchData('/notes', {})))
+            .then(response => dispatch(itemsFetchData(`/${id}/notes`, response, token)))
             .catch(() => dispatch(itemsHasErrored(true)));
   };
 }

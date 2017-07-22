@@ -8,7 +8,7 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import axios from 'axios';
-import { itemsFetchData, selectNote, newNoteView, postNewNote, updateNote, deleteNote } from './../redux/actions';
+import { itemsFetchData, selectNote, newNoteView, postNewNote, updateNote, deleteNote, init, itemsIsLoading } from './../redux/actions';
 import './../App.scss';
 import List from './List';
 import Note from './Note';
@@ -18,7 +18,7 @@ import Top from './Top';
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { access_token: '', id: '' };
+    this.state = { access_token: '', id: '', items: [] };
     this.newNote = this.newNote.bind(this);
     this.getNotes = this.getNotes.bind(this);
     this.selectNote = this.selectNote.bind(this);
@@ -28,22 +28,23 @@ class App extends React.Component {
   }
 
   async componentWillMount() {
+    this.props.itemsIsLoading(true);
     await this.getAccessToken();
     await this.getAuthId();
-    console.log(this.state);
-    this.getNotes();
+    await this.initApi();
+    this.props.itemsIsLoading(false);
   }
 
   getAccessToken() {
     const match = RegExp('[#&]access_token=([^&]*)').exec(window.location.hash);
     const token = match && decodeURIComponent(match[1].replace(/\+/g, ' '));
-    this.setState({ access_token: token });
+    const AuthStr = 'Bearer '.concat(token);
+    this.setState({ access_token: AuthStr });
   }
 
   async getAuthId() {
     let AuthId;
-    const AuthStr = 'Bearer '.concat(this.state.access_token);
-    await axios.get('https://vinnieking06.auth0.com/userinfo', { headers: { Authorization: AuthStr } })
+    await axios.get('https://vinnieking06.auth0.com/userinfo', { headers: { Authorization: this.state.access_token } })
       .then((response) => {
         AuthId = response.data.sub;
       })
@@ -57,18 +58,22 @@ class App extends React.Component {
     this.props.fetchData(`${this.state.id}/notes`, {}, true);
   }
 
+  initApi() {
+    this.props.init(`/${this.state.id}/init`, this.state.access_token);
+  }
+
   newNote(input) {
-    this.props.postNewNote('/notes', {
+    this.props.postNewNote(`${this.state.id}/notes`, {
       data: input.note,
       title: input.title,
-    });
+    }, this.state.access_token);
   }
 
   updateNote(input) {
-    this.props.updateNote(`/notes/${input.id}`, {
+    this.props.updateNote(`${this.state.id}/notes/${input.id}`, {
       data: input.note,
       title: input.title,
-    });
+    }, this.state.access_token, this.state.id);
   }
 
   selectNote(id) {
@@ -85,7 +90,7 @@ class App extends React.Component {
   }
 
   deleteNote(id) {
-    this.props.deleteNote(`/notes/${id}`);
+    this.props.deleteNote(`${this.state.id}/notes/${id}`, this.state.access_token, this.state.id);
   }
 
   render() {
@@ -120,6 +125,7 @@ class App extends React.Component {
 
 App.propTypes = {
   fetchData: PropTypes.func.isRequired,
+  init: PropTypes.func.isRequired,
   selectNote: PropTypes.func.isRequired,
   newNoteView: PropTypes.func.isRequired,
   updateNote: PropTypes.func.isRequired,
@@ -129,6 +135,7 @@ App.propTypes = {
   hasErrored: PropTypes.bool.isRequired,
   isLoading: PropTypes.bool.isRequired,
   current: PropTypes.any.isRequired,
+  itemsIsLoading: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => {
@@ -143,11 +150,13 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     fetchData: (url, current, initial) => dispatch(itemsFetchData(url, current, initial)),
+    init: (url, token) => dispatch(init(url, token)),
     selectNote: noteId => dispatch(selectNote(noteId)),
     newNoteView: () => dispatch(newNoteView()),
-    postNewNote: (url, data) => dispatch(postNewNote(url, data)),
-    updateNote: (url, data) => dispatch(updateNote(url, data)),
-    deleteNote: url => dispatch(deleteNote(url)),
+    postNewNote: (url, data, token) => dispatch(postNewNote(url, data, token)),
+    updateNote: (url, data, token, id) => dispatch(updateNote(url, data, token, id)),
+    deleteNote: (url, token, id) => dispatch(deleteNote(url, token, id)),
+    itemsIsLoading: bool => dispatch(itemsIsLoading(bool)),
   };
 };
 

@@ -29,7 +29,7 @@ const checkJwt = jwt({
 });
 
 app.get('/:user/init', checkJwt, (req, res) => {
-  Models.User.find({ where: {id: req.params.user }})
+  Models.User.findOne({ where: {id: req.params.user }})
     .then((user) => {
       if (user) {
         getNotes(req, res)
@@ -40,9 +40,9 @@ app.get('/:user/init', checkJwt, (req, res) => {
             res.send('Error getting notes!')
           })
       } else {
-          createUser(req.params.id)
+          createUser(req.params.user)
             .then((user) => {
-              res.json('New User created')
+              res.json([])
             })
       }
     })
@@ -84,9 +84,9 @@ app.get('/:user/notes/:id', checkJwt, (req, res) => {
 });
 
 app.put('/:user/notes/:id', checkJwt, (req, res) => {
-  Note.update({ data: req.body.data, title: req.body.title }, { where: { id: req.params.id, userId: req.params.user } })
+  Models.Note.update({ data: req.body.data, title: req.body.title }, { where: { id: req.params.id, userId: req.params.user } })
   .then(() => {
-    Note.findById(req.params.id)
+    Models.Note.findById(req.params.id)
     .then((note) => {
       res.json(note);
     });
@@ -94,13 +94,13 @@ app.put('/:user/notes/:id', checkJwt, (req, res) => {
 });
 
 app.delete('/:user/notes/:id', checkJwt, (req, res) => {
-  Note.destroy({ where: { id: req.params.id, userId: req.params.user } })
+  Models.Note.destroy({ where: { id: req.params.id, userId: req.params.user } })
   .then((note) => {
-    res.end(note);
+    res.json(note);
   });
 });
 
-app.get('*', checkJwt, function(req, res) {
+app.get('*', function(req, res) {
   res.sendFile(__dirname + '/index.html');
 })
 
