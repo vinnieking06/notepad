@@ -29,6 +29,26 @@ export function items(state = [], action) {
   }
 }
 
+export function token(state = '', action) {
+  switch (action.type) {
+    case 'ADD_TOKEN':
+      return action.token;
+
+    default:
+      return state;
+  }
+}
+
+export function id(state = '', action) {
+  switch (action.type) {
+    case 'ADD_ID':
+      return action.id;
+
+    default:
+      return state;
+  }
+}
+
 export function selectNote(state = {}, action) {
   switch (action.type) {
     case 'SELECT_NOTE':
@@ -41,6 +61,8 @@ export function selectNote(state = {}, action) {
 }
 export default combineReducers({
   items,
+  id,
+  token,
   itemsHasErrored,
   itemsIsLoading,
   selectNote,

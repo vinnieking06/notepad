@@ -21,6 +21,20 @@ export function itemsFetchDataSuccess(items) {
   };
 }
 
+export function addToken(token) {
+  return {
+    type: 'ADD_TOKEN',
+    token,
+  };
+}
+
+export function addId(id) {
+  return {
+    type: 'ADD_ID',
+    id,
+  };
+}
+
 export function selectNote(noteData) {
   return {
     type: 'SELECT_NOTE',
@@ -35,20 +49,25 @@ export function newNoteView() {
   };
 }
 
-export function init(url, token) {
+export function init(token) {
   return (dispatch) => {
-    axios(url, { headers: { Authorization: token } })
-        .then((response) => {
-          if (!response.status === 200) {
-            throw Error(response.statusText);
-          }
-
-          dispatch(itemsIsLoading(false));
-
-          return response;
-        })
-            .then(items => dispatch(itemsFetchDataSuccess(items.data)))
-            .catch(() => dispatch(itemsHasErrored(true)));
+    axios('https://vinnieking06.auth0.com/userinfo', { headers: { Authorization: token } })
+      .then((response) => {
+        dispatch(addId(response.data.sub));
+        return response.data.sub;
+      })
+      .then((id) => {
+        axios(`/${id}/init`, { headers: { Authorization: token } })
+            .then((response) => {
+              if (!response.status === 200) {
+                throw Error(response.statusText);
+              }
+              dispatch(itemsIsLoading(false));
+              return response;
+            })
+                .then(items => dispatch(itemsFetchDataSuccess(items.data)))
+                .catch(() => dispatch(itemsHasErrored(true)));
+      });
   };
 }
 
@@ -60,7 +79,6 @@ export function itemsFetchData(url, current, token) {
             throw Error(response.statusText);
           }
 
-          dispatch(itemsIsLoading(false));
 
           return response;
         })

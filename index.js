@@ -32029,6 +32029,8 @@ Object.defineProperty(exports, "__esModule", {
 exports.itemsHasErrored = itemsHasErrored;
 exports.itemsIsLoading = itemsIsLoading;
 exports.items = items;
+exports.token = token;
+exports.id = id;
 exports.selectNote = selectNote;
 
 var _redux = __webpack_require__(66);
@@ -32071,6 +32073,32 @@ function items() {
   }
 }
 
+function token() {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+  var action = arguments[1];
+
+  switch (action.type) {
+    case 'ADD_TOKEN':
+      return action.token;
+
+    default:
+      return state;
+  }
+}
+
+function id() {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+  var action = arguments[1];
+
+  switch (action.type) {
+    case 'ADD_ID':
+      return action.id;
+
+    default:
+      return state;
+  }
+}
+
 function selectNote() {
   var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var action = arguments[1];
@@ -32086,6 +32114,8 @@ function selectNote() {
 }
 exports.default = (0, _redux.combineReducers)({
   items: items,
+  id: id,
+  token: token,
   itemsHasErrored: itemsHasErrored,
   itemsIsLoading: itemsIsLoading,
   selectNote: selectNote
@@ -32111,10 +32141,6 @@ var _react2 = _interopRequireDefault(_react);
 var _reactRedux = __webpack_require__(110);
 
 var _reactRouter = __webpack_require__(10);
-
-var _axios = __webpack_require__(123);
-
-var _axios2 = _interopRequireDefault(_axios);
 
 var _actions = __webpack_require__(316);
 
@@ -32155,7 +32181,6 @@ var App = function (_React$Component) {
 
     var _this = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this, props));
 
-    _this.state = { access_token: '', id: '', items: [] };
     _this.newNote = _this.newNote.bind(_this);
     _this.getNotes = _this.getNotes.bind(_this);
     _this.selectNote = _this.selectNote.bind(_this);
@@ -32166,13 +32191,11 @@ var App = function (_React$Component) {
   }
 
   _createClass(App, [{
-    key: 'componentWillMount',
-    value: async function componentWillMount() {
+    key: 'componentDidMount',
+    value: async function componentDidMount() {
       this.props.itemsIsLoading(true);
       await this.getAccessToken();
-      await this.getAuthId();
       await this.initApi();
-      this.props.itemsIsLoading(false);
     }
   }, {
     key: 'getAccessToken',
@@ -32180,44 +32203,33 @@ var App = function (_React$Component) {
       var match = RegExp('[#&]access_token=([^&]*)').exec(window.location.hash);
       var token = match && decodeURIComponent(match[1].replace(/\+/g, ' '));
       var AuthStr = 'Bearer '.concat(token);
-      this.setState({ access_token: AuthStr });
-    }
-  }, {
-    key: 'getAuthId',
-    value: async function getAuthId() {
-      var AuthId = void 0;
-      await _axios2.default.get('https://vinnieking06.auth0.com/userinfo', { headers: { Authorization: this.state.access_token } }).then(function (response) {
-        AuthId = response.data.sub;
-      }).catch(function (error) {
-        console.log(error);
-      });
-      this.setState({ id: AuthId });
+      this.props.addToken(AuthStr);
     }
   }, {
     key: 'getNotes',
     value: function getNotes() {
-      this.props.fetchData(this.state.id + '/notes', {}, true);
+      this.props.fetchData(this.props.id + '/notes', {}, true);
     }
   }, {
     key: 'initApi',
     value: function initApi() {
-      this.props.init('/' + this.state.id + '/init', this.state.access_token);
+      this.props.init(this.props.token);
     }
   }, {
     key: 'newNote',
     value: function newNote(input) {
-      this.props.postNewNote(this.state.id + '/notes', {
+      this.props.postNewNote(this.props.id + '/notes', {
         data: input.note,
         title: input.title
-      }, this.state.access_token);
+      }, this.props.token);
     }
   }, {
     key: 'updateNote',
     value: function updateNote(input) {
-      this.props.updateNote(this.state.id + '/notes/' + input.id, {
+      this.props.updateNote(this.props.id + '/notes/' + input.id, {
         data: input.note,
         title: input.title
-      }, this.state.access_token, this.state.id);
+      }, this.props.token, this.props.id);
     }
   }, {
     key: 'selectNote',
@@ -32225,8 +32237,6 @@ var App = function (_React$Component) {
       var curr = this.findNote(this.props.items, id)[0];
       this.props.selectNote(curr);
     }
-    // move this into actions?
-
   }, {
     key: 'findNote',
     value: function findNote(notes, id) {
@@ -32242,7 +32252,7 @@ var App = function (_React$Component) {
   }, {
     key: 'deleteNote',
     value: function deleteNote(id) {
-      this.props.deleteNote(this.state.id + '/notes/' + id, this.state.access_token, this.state.id);
+      this.props.deleteNote(this.props.id + '/notes/' + id, this.props.token, this.props.id);
     }
   }, {
     key: 'render',
@@ -32297,7 +32307,12 @@ App.propTypes = {
   hasErrored: _react.PropTypes.bool.isRequired,
   isLoading: _react.PropTypes.bool.isRequired,
   current: _react.PropTypes.any.isRequired,
-  itemsIsLoading: _react.PropTypes.func.isRequired
+  itemsIsLoading: _react.PropTypes.func.isRequired,
+  addToken: _react.PropTypes.func.isRequired,
+  token: _react.PropTypes.any.isRequired,
+  id: _react.PropTypes.any.isRequired,
+  getId: _react.PropTypes.func.isRequired
+
 };
 
 var mapStateToProps = function mapStateToProps(state) {
@@ -32305,7 +32320,9 @@ var mapStateToProps = function mapStateToProps(state) {
     items: state.items,
     hasErrored: state.itemsHasErrored,
     isLoading: state.itemsIsLoading,
-    current: state.selectNote
+    current: state.selectNote,
+    token: state.token,
+    id: state.id
   };
 };
 
@@ -32334,6 +32351,12 @@ var mapDispatchToProps = function mapDispatchToProps(dispatch) {
     },
     itemsIsLoading: function itemsIsLoading(bool) {
       return dispatch((0, _actions.itemsIsLoading)(bool));
+    },
+    addToken: function addToken(token) {
+      return dispatch((0, _actions.addToken)(token));
+    },
+    getId: function getId(url, token) {
+      return dispatch((0, _actions.getId)(url, token));
     }
   };
 };
@@ -33223,6 +33246,8 @@ Object.defineProperty(exports, "__esModule", {
 exports.itemsHasErrored = itemsHasErrored;
 exports.itemsIsLoading = itemsIsLoading;
 exports.itemsFetchDataSuccess = itemsFetchDataSuccess;
+exports.addToken = addToken;
+exports.addId = addId;
 exports.selectNote = selectNote;
 exports.newNoteView = newNoteView;
 exports.init = init;
@@ -33260,6 +33285,20 @@ function itemsFetchDataSuccess(items) {
   };
 }
 
+function addToken(token) {
+  return {
+    type: 'ADD_TOKEN',
+    token: token
+  };
+}
+
+function addId(id) {
+  return {
+    type: 'ADD_ID',
+    id: id
+  };
+}
+
 function selectNote(noteData) {
   return {
     type: 'SELECT_NOTE',
@@ -33274,20 +33313,23 @@ function newNoteView() {
   };
 }
 
-function init(url, token) {
+function init(token) {
   return function (dispatch) {
-    (0, _axios2.default)(url, { headers: { Authorization: token } }).then(function (response) {
-      if (!response.status === 200) {
-        throw Error(response.statusText);
-      }
-
-      dispatch(itemsIsLoading(false));
-
-      return response;
-    }).then(function (items) {
-      return dispatch(itemsFetchDataSuccess(items.data));
-    }).catch(function () {
-      return dispatch(itemsHasErrored(true));
+    (0, _axios2.default)('https://vinnieking06.auth0.com/userinfo', { headers: { Authorization: token } }).then(function (response) {
+      dispatch(addId(response.data.sub));
+      return response.data.sub;
+    }).then(function (id) {
+      (0, _axios2.default)('/' + id + '/init', { headers: { Authorization: token } }).then(function (response) {
+        if (!response.status === 200) {
+          throw Error(response.statusText);
+        }
+        dispatch(itemsIsLoading(false));
+        return response;
+      }).then(function (items) {
+        return dispatch(itemsFetchDataSuccess(items.data));
+      }).catch(function () {
+        return dispatch(itemsHasErrored(true));
+      });
     });
   };
 }
@@ -33298,8 +33340,6 @@ function itemsFetchData(url, current, token) {
       if (!response.status === 200) {
         throw Error(response.statusText);
       }
-
-      dispatch(itemsIsLoading(false));
 
       return response;
     }).then(function (items) {

@@ -7,8 +7,7 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
-import axios from 'axios';
-import { itemsFetchData, selectNote, newNoteView, postNewNote, updateNote, deleteNote, init, itemsIsLoading } from './../redux/actions';
+import { itemsFetchData, selectNote, newNoteView, postNewNote, updateNote, deleteNote, init, itemsIsLoading, addToken, getId } from './../redux/actions';
 import './../App.scss';
 import List from './List';
 import Note from './Note';
@@ -18,7 +17,6 @@ import Top from './Top';
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { access_token: '', id: '', items: [] };
     this.newNote = this.newNote.bind(this);
     this.getNotes = this.getNotes.bind(this);
     this.selectNote = this.selectNote.bind(this);
@@ -27,60 +25,46 @@ class App extends React.Component {
     this.deleteNote = this.deleteNote.bind(this);
   }
 
-  async componentWillMount() {
+  async componentDidMount() {
     this.props.itemsIsLoading(true);
     await this.getAccessToken();
-    await this.getAuthId();
     await this.initApi();
-    this.props.itemsIsLoading(false);
   }
 
   getAccessToken() {
     const match = RegExp('[#&]access_token=([^&]*)').exec(window.location.hash);
     const token = match && decodeURIComponent(match[1].replace(/\+/g, ' '));
     const AuthStr = 'Bearer '.concat(token);
-    this.setState({ access_token: AuthStr });
-  }
-
-  async getAuthId() {
-    let AuthId;
-    await axios.get('https://vinnieking06.auth0.com/userinfo', { headers: { Authorization: this.state.access_token } })
-      .then((response) => {
-        AuthId = response.data.sub;
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    this.setState({ id: AuthId });
+    this.props.addToken(AuthStr);
   }
 
   getNotes() {
-    this.props.fetchData(`${this.state.id}/notes`, {}, true);
+    this.props.fetchData(`${this.props.id}/notes`, {}, true);
   }
 
   initApi() {
-    this.props.init(`/${this.state.id}/init`, this.state.access_token);
+    this.props.init(this.props.token);
   }
 
   newNote(input) {
-    this.props.postNewNote(`${this.state.id}/notes`, {
+    this.props.postNewNote(`${this.props.id}/notes`, {
       data: input.note,
       title: input.title,
-    }, this.state.access_token);
+    }, this.props.token);
   }
 
   updateNote(input) {
-    this.props.updateNote(`${this.state.id}/notes/${input.id}`, {
+    this.props.updateNote(`${this.props.id}/notes/${input.id}`, {
       data: input.note,
       title: input.title,
-    }, this.state.access_token, this.state.id);
+    }, this.props.token, this.props.id);
   }
 
   selectNote(id) {
     const curr = this.findNote(this.props.items, id)[0];
     this.props.selectNote(curr);
   }
-// move this into actions?
+
   findNote(notes, id) {
     return notes.filter(note => note.id === id);
   }
@@ -90,7 +74,7 @@ class App extends React.Component {
   }
 
   deleteNote(id) {
-    this.props.deleteNote(`${this.state.id}/notes/${id}`, this.state.access_token, this.state.id);
+    this.props.deleteNote(`${this.props.id}/notes/${id}`, this.props.token, this.props.id);
   }
 
   render() {
@@ -136,6 +120,11 @@ App.propTypes = {
   isLoading: PropTypes.bool.isRequired,
   current: PropTypes.any.isRequired,
   itemsIsLoading: PropTypes.func.isRequired,
+  addToken: PropTypes.func.isRequired,
+  token: PropTypes.any.isRequired,
+  id: PropTypes.any.isRequired,
+  getId: PropTypes.func.isRequired,
+
 };
 
 const mapStateToProps = (state) => {
@@ -144,6 +133,8 @@ const mapStateToProps = (state) => {
     hasErrored: state.itemsHasErrored,
     isLoading: state.itemsIsLoading,
     current: state.selectNote,
+    token: state.token,
+    id: state.id,
   };
 };
 
@@ -157,6 +148,8 @@ const mapDispatchToProps = (dispatch) => {
     updateNote: (url, data, token, id) => dispatch(updateNote(url, data, token, id)),
     deleteNote: (url, token, id) => dispatch(deleteNote(url, token, id)),
     itemsIsLoading: bool => dispatch(itemsIsLoading(bool)),
+    addToken: token => dispatch(addToken(token)),
+    getId: (url, token) => dispatch(getId(url, token)),
   };
 };
 
