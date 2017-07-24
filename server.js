@@ -37,9 +37,6 @@ app.get('/:user/init', checkJwt, (req, res) => {
         getNotes(req, res)
           .then((notes) => {
             res.json(notes);
-          })
-          .catch(() => {
-            res.send(500);
           });
       } else {
         createUser(req.params.user)
@@ -91,6 +88,9 @@ app.put('/:user/notes/:id', checkJwt, (req, res) => {
     .then((note) => {
       res.json(note);
     });
+  })
+  .catch(() => {
+    res.send(500);
   });
 });
 
@@ -98,6 +98,9 @@ app.delete('/:user/notes/:id', checkJwt, (req, res) => {
   Models.Note.destroy({ where: { id: req.params.id, userId: req.params.user } })
   .then((note) => {
     res.json(note);
+  })
+  .catch(() => {
+    res.send(500);
   });
 });
 
