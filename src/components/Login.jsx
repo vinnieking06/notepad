@@ -16,7 +16,7 @@ export default class Login extends React.Component {
       <div id="login">
         <h1>Note Pad</h1>
         <p>A place to write about your memories, passions and goals.</p>
-        <a href="https://vinnieking06.auth0.com/authorize?audience=https://vinnieking06.auth0.com/api/v2/&scope=openid&response_type=token&client_id=OaxoFFEBwMQbEcLlERTltCHUEUSn5eYp&redirect_uri=http://localhost:5000/user">
+        <a href="https://vinnieking06.auth0.com/authorize?audience=https://vinnieking06.auth0.com/api/v2/&scope=openid&response_type=token&client_id=OaxoFFEBwMQbEcLlERTltCHUEUSn5eYp&redirect_uri=https://stc-notepad.herokuapp.com/user">
           <button>Sign in</button>
         </a>
       </div>
