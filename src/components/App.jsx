@@ -7,7 +7,7 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
-import { itemsFetchData, selectNote, newNoteView, postNewNote, updateNote, deleteNote, init, itemsIsLoading, addToken, getId } from './../redux/actions';
+import { selectNote, newNoteView, postNewNote, updateNote, deleteNote, init, itemsIsLoading, addToken, itemsHasErrored } from './../redux/actions';
 import './../App.scss';
 import List from './List';
 import Note from './Note';
@@ -18,7 +18,6 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.newNote = this.newNote.bind(this);
-    this.getNotes = this.getNotes.bind(this);
     this.selectNote = this.selectNote.bind(this);
     this.newNoteView = this.newNoteView.bind(this);
     this.updateNote = this.updateNote.bind(this);
@@ -29,29 +28,29 @@ class App extends React.Component {
   async componentDidMount() {
     this.props.itemsIsLoading(true);
     await this.getAccessToken();
-    await this.initApi();
+    this.initApi();
   }
 
   getAccessToken() {
     const localToken = localStorage.getItem('token');
+    const match = RegExp('[#&]access_token=([^&]*)').exec(window.location.hash);
     if (localToken) {
       const AuthStr = 'Bearer '.concat(localToken);
       this.props.addToken(AuthStr);
-    } else {
-      const match = RegExp('[#&]access_token=([^&]*)').exec(window.location.hash);
+    } else if (match) {
       const token = match && decodeURIComponent(match[1].replace(/\+/g, ' '));
       localStorage.setItem('token', token);
       const AuthStr = 'Bearer '.concat(token);
       this.props.addToken(AuthStr);
+    } else {
+      this.props.itemsHasErrored(true);
     }
   }
 
-  getNotes() {
-    this.props.fetchData(`${this.props.id}/notes`, {}, true);
-  }
-
   initApi() {
-    this.props.init(this.props.token);
+    if (this.props.token) {
+      this.props.init(this.props.token);
+    }
   }
 
   newNote(input) {
@@ -121,7 +120,6 @@ class App extends React.Component {
 }
 
 App.propTypes = {
-  fetchData: PropTypes.func.isRequired,
   init: PropTypes.func.isRequired,
   selectNote: PropTypes.func.isRequired,
   newNoteView: PropTypes.func.isRequired,
@@ -137,6 +135,8 @@ App.propTypes = {
   token: PropTypes.any.isRequired,
   id: PropTypes.any.isRequired,
   history: PropTypes.any.isRequired,
+  itemsHasErrored: PropTypes.func.isRequired,
+
 };
 
 const mapStateToProps = (state) => {
@@ -152,7 +152,6 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    fetchData: (url, current, initial) => dispatch(itemsFetchData(url, current, initial)),
     init: (url, token) => dispatch(init(url, token)),
     selectNote: noteId => dispatch(selectNote(noteId)),
     newNoteView: () => dispatch(newNoteView()),
@@ -161,10 +160,8 @@ const mapDispatchToProps = (dispatch) => {
     deleteNote: (url, token, id) => dispatch(deleteNote(url, token, id)),
     itemsIsLoading: bool => dispatch(itemsIsLoading(bool)),
     addToken: token => dispatch(addToken(token)),
+    itemsHasErrored: bool => dispatch(itemsHasErrored(bool)),
   };
 };
-
-
-// export default connect(mapStateToProps, mapDispatchToProps)(App);
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App));
