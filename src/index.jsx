@@ -8,7 +8,6 @@ import configureStore from './redux/store';
 import App from './components/App';
 import Login from './components/Login';
 
-
 const store = configureStore();
 
 render(

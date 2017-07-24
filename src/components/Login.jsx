@@ -12,10 +12,15 @@ export default class Login extends React.Component {
     auth.login();
   }
 
+  componentDidMount() {
+    if (localStorage.getItem('token') !== null) {
+      this.props.history.push('/user');
+    }
+  }
+
   render() {
     return (
       <div>
-        <button onClick={this.showLogin}/>
         <a href="https://vinnieking06.auth0.com/authorize?audience=https://vinnieking06.auth0.com/api/v2/&scope=openid&response_type=token&client_id=OaxoFFEBwMQbEcLlERTltCHUEUSn5eYp&redirect_uri=http://localhost:5000/user">
         sign in
         </a>

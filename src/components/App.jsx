@@ -23,6 +23,7 @@ class App extends React.Component {
     this.newNoteView = this.newNoteView.bind(this);
     this.updateNote = this.updateNote.bind(this);
     this.deleteNote = this.deleteNote.bind(this);
+    this.logOut = this.logOut.bind(this);
   }
 
   async componentDidMount() {
@@ -32,10 +33,17 @@ class App extends React.Component {
   }
 
   getAccessToken() {
-    const match = RegExp('[#&]access_token=([^&]*)').exec(window.location.hash);
-    const token = match && decodeURIComponent(match[1].replace(/\+/g, ' '));
-    const AuthStr = 'Bearer '.concat(token);
-    this.props.addToken(AuthStr);
+    const localToken = localStorage.getItem('token');
+    if (localToken) {
+      const AuthStr = 'Bearer '.concat(localToken);
+      this.props.addToken(AuthStr);
+    } else {
+      const match = RegExp('[#&]access_token=([^&]*)').exec(window.location.hash);
+      const token = match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+      localStorage.setItem('token', token);
+      const AuthStr = 'Bearer '.concat(token);
+      this.props.addToken(AuthStr);
+    }
   }
 
   getNotes() {
@@ -77,6 +85,11 @@ class App extends React.Component {
     this.props.deleteNote(`${this.props.id}/notes/${id}`, this.props.token, this.props.id);
   }
 
+  logOut() {
+    localStorage.removeItem('token');
+    this.props.history.push('/');
+  }
+
   render() {
     if (this.props.hasErrored) {
       return <p>Sorry! There was an error loading the items</p>;
@@ -87,7 +100,7 @@ class App extends React.Component {
     }
     return (
       <div id="app">
-        <Top />
+        <Top logOut={this.logOut} />
         <div id="list-note">
           <List
             deleteNote={this.deleteNote}
@@ -123,8 +136,7 @@ App.propTypes = {
   addToken: PropTypes.func.isRequired,
   token: PropTypes.any.isRequired,
   id: PropTypes.any.isRequired,
-  getId: PropTypes.func.isRequired,
-
+  history: PropTypes.any.isRequired,
 };
 
 const mapStateToProps = (state) => {
@@ -149,7 +161,6 @@ const mapDispatchToProps = (dispatch) => {
     deleteNote: (url, token, id) => dispatch(deleteNote(url, token, id)),
     itemsIsLoading: bool => dispatch(itemsIsLoading(bool)),
     addToken: token => dispatch(addToken(token)),
-    getId: (url, token) => dispatch(getId(url, token)),
   };
 };
 

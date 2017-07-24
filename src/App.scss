@@ -38,6 +38,13 @@ h3 { margin-top: 0;
    } 
 
 .TopContainer {
+  button:hover {
+    background-color:red;
+    border:1px solid red
+  }
+  button {
+    float: right
+  }
   background-color: $blue;
   text-align: center;
   height: 100px;

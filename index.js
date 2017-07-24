@@ -32187,6 +32187,7 @@ var App = function (_React$Component) {
     _this.newNoteView = _this.newNoteView.bind(_this);
     _this.updateNote = _this.updateNote.bind(_this);
     _this.deleteNote = _this.deleteNote.bind(_this);
+    _this.logOut = _this.logOut.bind(_this);
     return _this;
   }
 
@@ -32200,10 +32201,17 @@ var App = function (_React$Component) {
   }, {
     key: 'getAccessToken',
     value: function getAccessToken() {
-      var match = RegExp('[#&]access_token=([^&]*)').exec(window.location.hash);
-      var token = match && decodeURIComponent(match[1].replace(/\+/g, ' '));
-      var AuthStr = 'Bearer '.concat(token);
-      this.props.addToken(AuthStr);
+      var localToken = localStorage.getItem('token');
+      if (localToken) {
+        var AuthStr = 'Bearer '.concat(localToken);
+        this.props.addToken(AuthStr);
+      } else {
+        var match = RegExp('[#&]access_token=([^&]*)').exec(window.location.hash);
+        var token = match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+        localStorage.setItem('token', token);
+        var _AuthStr = 'Bearer '.concat(token);
+        this.props.addToken(_AuthStr);
+      }
     }
   }, {
     key: 'getNotes',
@@ -32255,6 +32263,12 @@ var App = function (_React$Component) {
       this.props.deleteNote(this.props.id + '/notes/' + id, this.props.token, this.props.id);
     }
   }, {
+    key: 'logOut',
+    value: function logOut() {
+      localStorage.removeItem('token');
+      this.props.history.push('/');
+    }
+  }, {
     key: 'render',
     value: function render() {
       if (this.props.hasErrored) {
@@ -32271,7 +32285,7 @@ var App = function (_React$Component) {
       return _react2.default.createElement(
         'div',
         { id: 'app' },
-        _react2.default.createElement(_Top2.default, null),
+        _react2.default.createElement(_Top2.default, { logOut: this.logOut }),
         _react2.default.createElement(
           'div',
           { id: 'list-note' },
@@ -32311,8 +32325,7 @@ App.propTypes = {
   addToken: _react.PropTypes.func.isRequired,
   token: _react.PropTypes.any.isRequired,
   id: _react.PropTypes.any.isRequired,
-  getId: _react.PropTypes.func.isRequired
-
+  history: _react.PropTypes.any.isRequired
 };
 
 var mapStateToProps = function mapStateToProps(state) {
@@ -32354,9 +32367,6 @@ var mapDispatchToProps = function mapDispatchToProps(dispatch) {
     },
     addToken: function addToken(token) {
       return dispatch((0, _actions.addToken)(token));
-    },
-    getId: function getId(url, token) {
-      return dispatch((0, _actions.getId)(url, token));
     }
   };
 };
@@ -33439,7 +33449,7 @@ exports = module.exports = __webpack_require__(73)(undefined);
 
 
 // module
-exports.push([module.i, "button {\n  background-color: #FC4A1A;\n  margin: 2px;\n  -moz-border-radius: 28px;\n  -webkit-border-radius: 28px;\n  border-radius: 28px;\n  border: 1px solid #FC4A1A;\n  display: inline-block;\n  cursor: pointer;\n  color: #ffffff;\n  font-family: Arial;\n  padding: 10px 10px;\n  text-decoration: none;\n  text-shadow: 0px 1px 0px #FC4A1A; }\n\nbutton:hover {\n  background-color: #4ABDAC;\n  border: 1px solid #4ABDAC; }\n\nbutton:active {\n  position: relative;\n  top: 1px; }\n\nbutton:focus {\n  outline: 0; }\n\nli {\n  list-style-type: none; }\n\nh3 {\n  margin-top: 0;\n  padding-top: 15px; }\n\n.TopContainer {\n  background-color: #4ABDAC;\n  text-align: center;\n  height: 100px;\n  color: white; }\n\n#listContainer {\n  width: 30%;\n  text-align: center; }\n  #listContainer .note {\n    background-color: #DFDCE3;\n    margin: auto;\n    border-radius: 10px;\n    margin: 2px;\n    display: flex;\n    flex-direction: row;\n    justify-content: space-around; }\n    #listContainer .note span {\n      margin: auto; }\n    #listContainer .note button:hover {\n      background-color: red;\n      border: 1px solid red; }\n  #listContainer .note:hover {\n    background-color: #4ABDAC;\n    border: 1px solid #4ABDAC;\n    cursor: pointer;\n    cursor: hand; }\n  #listContainer .note:active {\n    position: relative;\n    top: 1px; }\n\n#list-note {\n  height: 705px;\n  display: flex;\n  flex-direction: row; }\n\n.noteContainer {\n  flex: 1;\n  display: flex;\n  flex-direction: column;\n  align-items: center; }\n  .noteContainer input {\n    box-sizing: border-box;\n    -webkit-box-sizing: border-box;\n    -moz-box-sizing: border-box;\n    outline: none;\n    display: block;\n    width: 100%;\n    padding: 7px;\n    border: none;\n    border-bottom: 1px solid #ddd;\n    background: transparent;\n    margin-bottom: 10px;\n    font: 16px Arial, Helvetica, sans-serif;\n    height: 45px; }\n\n.notebook {\n  background: url(\"http://bookofzeus.com/download/notebook.png\") repeat-y;\n  width: 600px;\n  height: 300px;\n  font: normal 14px verdana;\n  line-height: 25px;\n  padding: 2px 10px;\n  border: solid 1px #ddd; }\n", ""]);
+exports.push([module.i, "button {\n  background-color: #FC4A1A;\n  margin: 2px;\n  -moz-border-radius: 28px;\n  -webkit-border-radius: 28px;\n  border-radius: 28px;\n  border: 1px solid #FC4A1A;\n  display: inline-block;\n  cursor: pointer;\n  color: #ffffff;\n  font-family: Arial;\n  padding: 10px 10px;\n  text-decoration: none;\n  text-shadow: 0px 1px 0px #FC4A1A; }\n\nbutton:hover {\n  background-color: #4ABDAC;\n  border: 1px solid #4ABDAC; }\n\nbutton:active {\n  position: relative;\n  top: 1px; }\n\nbutton:focus {\n  outline: 0; }\n\nli {\n  list-style-type: none; }\n\nh3 {\n  margin-top: 0;\n  padding-top: 15px; }\n\n.TopContainer {\n  background-color: #4ABDAC;\n  text-align: center;\n  height: 100px;\n  color: white; }\n  .TopContainer button:hover {\n    background-color: red;\n    border: 1px solid red; }\n  .TopContainer button {\n    float: right; }\n\n#listContainer {\n  width: 30%;\n  text-align: center; }\n  #listContainer .note {\n    background-color: #DFDCE3;\n    margin: auto;\n    border-radius: 10px;\n    margin: 2px;\n    display: flex;\n    flex-direction: row;\n    justify-content: space-around; }\n    #listContainer .note span {\n      margin: auto; }\n    #listContainer .note button:hover {\n      background-color: red;\n      border: 1px solid red; }\n  #listContainer .note:hover {\n    background-color: #4ABDAC;\n    border: 1px solid #4ABDAC;\n    cursor: pointer;\n    cursor: hand; }\n  #listContainer .note:active {\n    position: relative;\n    top: 1px; }\n\n#list-note {\n  height: 705px;\n  display: flex;\n  flex-direction: row; }\n\n.noteContainer {\n  flex: 1;\n  display: flex;\n  flex-direction: column;\n  align-items: center; }\n  .noteContainer input {\n    box-sizing: border-box;\n    -webkit-box-sizing: border-box;\n    -moz-box-sizing: border-box;\n    outline: none;\n    display: block;\n    width: 100%;\n    padding: 7px;\n    border: none;\n    border-bottom: 1px solid #ddd;\n    background: transparent;\n    margin-bottom: 10px;\n    font: 16px Arial, Helvetica, sans-serif;\n    height: 45px; }\n\n.notebook {\n  background: url(\"http://bookofzeus.com/download/notebook.png\") repeat-y;\n  width: 600px;\n  height: 300px;\n  font: normal 14px verdana;\n  line-height: 25px;\n  padding: 2px 10px;\n  border: solid 1px #ddd; }\n", ""]);
 
 // exports
 
@@ -33752,7 +33762,7 @@ var _react2 = _interopRequireDefault(_react);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var Top = function Top() {
+var Top = function Top(props) {
   return _react2.default.createElement(
     "div",
     { className: "TopContainer" },
@@ -33762,11 +33772,20 @@ var Top = function Top() {
       "NotePad"
     ),
     _react2.default.createElement(
-      "p",
+      "span",
       null,
       "A place to write about your memories, passions and goals."
+    ),
+    _react2.default.createElement(
+      "button",
+      { onClick: props.logOut },
+      " Logout "
     )
   );
+};
+
+Top.propTypes = {
+  logOut: _react.PropTypes.func.isRequired
 };
 
 exports.default = Top;
@@ -33818,12 +33837,18 @@ var Login = function (_React$Component) {
       auth.login();
     }
   }, {
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      if (localStorage.getItem('token') !== null) {
+        this.props.history.push('/user');
+      }
+    }
+  }, {
     key: 'render',
     value: function render() {
       return _react2.default.createElement(
         'div',
         null,
-        _react2.default.createElement('button', { onClick: this.showLogin }),
         _react2.default.createElement(
           'a',
           { href: 'https://vinnieking06.auth0.com/authorize?audience=https://vinnieking06.auth0.com/api/v2/&scope=openid&response_type=token&client_id=OaxoFFEBwMQbEcLlERTltCHUEUSn5eYp&redirect_uri=http://localhost:5000/user' },
