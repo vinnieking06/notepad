@@ -21,6 +21,20 @@ export function itemsFetchDataSuccess(items) {
   };
 }
 
+export function addToken(token) {
+  return {
+    type: 'ADD_TOKEN',
+    token,
+  };
+}
+
+export function addId(id) {
+  return {
+    type: 'ADD_ID',
+    id,
+  };
+}
+
 export function selectNote(noteData) {
   return {
     type: 'SELECT_NOTE',
@@ -35,22 +49,39 @@ export function newNoteView() {
   };
 }
 
-export function itemsFetchData(url, current, initial) {
+export function init(token) {
   return (dispatch) => {
-    if (initial === true) {
-      dispatch(itemsIsLoading(true));
-    }
-    axios(url)
+    axios('https://vinnieking06.auth0.com/userinfo', { headers: { Authorization: token } })
+      .then((response) => {
+        dispatch(addId(response.data.sub));
+        return response.data.sub;
+      })
+      .then((id) => {
+        axios(`/${id}/init`, { headers: { Authorization: token } })
+            .then((response) => {
+              if (!response.status === 200) {
+                throw Error(response.statusText);
+              }
+              dispatch(itemsIsLoading(false));
+              return response;
+            })
+                .then(items => dispatch(itemsFetchDataSuccess(items.data)))
+                .catch(() => dispatch(itemsHasErrored(true)));
+      });
+  };
+}
+
+export function itemsFetchData(url, current, token) {
+  return (dispatch) => {
+    axios(url, { headers: { Authorization: token } })
         .then((response) => {
           if (!response.status === 200) {
             throw Error(response.statusText);
           }
 
-          dispatch(itemsIsLoading(false));
 
           return response;
         })
-            .then(response => response)
             .then(items => dispatch(itemsFetchDataSuccess(items.data)))
             .then(() => {
               if (current) {
@@ -61,44 +92,44 @@ export function itemsFetchData(url, current, initial) {
   };
 }
 
-export function postNewNote(url, data) {
+export function postNewNote(url, data, token) {
   return (dispatch) => {
-    axios.post(url, data)
+    axios.post(url, data, { headers: { Authorization: token } })
         .then((response) => {
           if (!response.status === 200) {
             throw Error(response.statusText);
           }
           return response;
         })
-            .then(response => dispatch(itemsFetchData('/notes', response)))
+            .then(response => dispatch(itemsFetchData(url, response, token)))
             .catch(() => dispatch(itemsHasErrored(true)));
   };
 }
 
-export function updateNote(url, data) {
+export function updateNote(url, data, token, id) {
   return (dispatch) => {
-    axios.put(url, data)
+    axios.put(url, data, { headers: { Authorization: token } })
         .then((response) => {
           if (!response.status === 200) {
             throw Error(response.statusText);
           }
           return response;
         })
-            .then(response => dispatch(itemsFetchData('/notes', response)))
+            .then(response => dispatch(itemsFetchData(`/${id}/notes`, response, token)))
             .catch(() => dispatch(itemsHasErrored(true)));
   };
 }
 
-export function deleteNote(url) {
+export function deleteNote(url, token, id) {
   return (dispatch) => {
-    axios.delete(url)
+    axios.delete(url, { headers: { Authorization: token } })
         .then((response) => {
           if (!response.status === 200) {
             throw Error(response.statusText);
           }
           return response;
         })
-            .then(() => dispatch(itemsFetchData('/notes', {})))
+            .then(response => dispatch(itemsFetchData(`/${id}/notes`, response, token)))
             .catch(() => dispatch(itemsHasErrored(true)));
   };
 }

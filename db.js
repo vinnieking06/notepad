@@ -1,7 +1,6 @@
 const Sequelize = require('sequelize');
 
-//const sequelize = new Sequelize('postgres://vincentking:ilovetesting@localhost:5432/notepad');
-const sequelize = new Sequelize('postgres://fkdyrlsr:JzhorQXQH_LpYcX30-1LWHvZvPFuqvRX@elmer.db.elephantsql.com:5432/fkdyrlsr');
+const sequelize = new Sequelize('postgres://cmylunjh:8hqd45a2YC6vQuMUjevYwHSRZyKgpUy6@stampy.db.elephantsql.com:5432/cmylunjh');
 
 sequelize
   .authenticate()
@@ -12,6 +11,13 @@ sequelize
     console.log('Unable to connect to the database:', err);
   });
 
+const User = sequelize.define('user', {
+  id: {
+    type: Sequelize.STRING,
+    primaryKey: true,
+  },
+});
+
 const Note = sequelize.define('note', {
   data: {
     type: Sequelize.STRING,
@@ -20,7 +26,19 @@ const Note = sequelize.define('note', {
     type: Sequelize.STRING,
   },
 });
-Note.sync({force: true}).then(function () {
-  console.log("Created Notes Table")
+
+Note.belongsTo(User);
+User.hasMany(Note);
+
+User.sync({ }).then(() => {
+  Note.sync({ }).then(() => {
+    console.log('Created tables');
+  });
 });
-module.exports = Note;
+
+const Models = {};
+
+Models.User = User;
+Models.Note = Note;
+
+module.exports = Models;

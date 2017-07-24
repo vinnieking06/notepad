@@ -1,10 +1,13 @@
 /* eslint class-methods-use-this: 0*/
 /* eslint react/forbid-prop-types: 0 */
 /* eslint arrow-body-style: 0 */
+/* eslint-env browser */
+
 
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { itemsFetchData, selectNote, newNoteView, postNewNote, updateNote, deleteNote } from './../redux/actions';
+import { withRouter } from 'react-router';
+import { selectNote, newNoteView, postNewNote, updateNote, deleteNote, init, itemsIsLoading, addToken, itemsHasErrored } from './../redux/actions';
 import './../App.scss';
 import List from './List';
 import Note from './Note';
@@ -15,40 +18,60 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.newNote = this.newNote.bind(this);
-    this.getNotes = this.getNotes.bind(this);
     this.selectNote = this.selectNote.bind(this);
     this.newNoteView = this.newNoteView.bind(this);
     this.updateNote = this.updateNote.bind(this);
     this.deleteNote = this.deleteNote.bind(this);
+    this.logOut = this.logOut.bind(this);
   }
 
-  componentWillMount() {
-    this.getNotes();
+  async componentDidMount() {
+    this.props.itemsIsLoading(true);
+    await this.getAccessToken();
+    this.initApi();
   }
 
-  getNotes() {
-    this.props.fetchData('/notes', {}, true);
+  getAccessToken() {
+    const localToken = localStorage.getItem('token');
+    const match = RegExp('[#&]access_token=([^&]*)').exec(window.location.hash);
+    if (localToken) {
+      const AuthStr = 'Bearer '.concat(localToken);
+      this.props.addToken(AuthStr);
+    } else if (match) {
+      const token = match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+      localStorage.setItem('token', token);
+      const AuthStr = 'Bearer '.concat(token);
+      this.props.addToken(AuthStr);
+    } else {
+      this.props.itemsHasErrored(true);
+    }
+  }
+
+  initApi() {
+    if (this.props.token) {
+      this.props.init(this.props.token);
+    }
   }
 
   newNote(input) {
-    this.props.postNewNote('/notes', {
+    this.props.postNewNote(`${this.props.id}/notes`, {
       data: input.note,
       title: input.title,
-    });
+    }, this.props.token);
   }
 
   updateNote(input) {
-    this.props.updateNote(`/notes/${input.id}`, {
+    this.props.updateNote(`${this.props.id}/notes/${input.id}`, {
       data: input.note,
       title: input.title,
-    });
+    }, this.props.token, this.props.id);
   }
 
   selectNote(id) {
     const curr = this.findNote(this.props.items, id)[0];
     this.props.selectNote(curr);
   }
-// move this into actions?
+
   findNote(notes, id) {
     return notes.filter(note => note.id === id);
   }
@@ -58,7 +81,12 @@ class App extends React.Component {
   }
 
   deleteNote(id) {
-    this.props.deleteNote(`/notes/${id}`);
+    this.props.deleteNote(`${this.props.id}/notes/${id}`, this.props.token, this.props.id);
+  }
+
+  logOut() {
+    localStorage.removeItem('token');
+    this.props.history.push('/');
   }
 
   render() {
@@ -71,7 +99,7 @@ class App extends React.Component {
     }
     return (
       <div id="app">
-        <Top />
+        <Top logOut={this.logOut} />
         <div id="list-note">
           <List
             deleteNote={this.deleteNote}
@@ -92,7 +120,7 @@ class App extends React.Component {
 }
 
 App.propTypes = {
-  fetchData: PropTypes.func.isRequired,
+  init: PropTypes.func.isRequired,
   selectNote: PropTypes.func.isRequired,
   newNoteView: PropTypes.func.isRequired,
   updateNote: PropTypes.func.isRequired,
@@ -102,6 +130,13 @@ App.propTypes = {
   hasErrored: PropTypes.bool.isRequired,
   isLoading: PropTypes.bool.isRequired,
   current: PropTypes.any.isRequired,
+  itemsIsLoading: PropTypes.func.isRequired,
+  addToken: PropTypes.func.isRequired,
+  token: PropTypes.any.isRequired,
+  id: PropTypes.any.isRequired,
+  history: PropTypes.any.isRequired,
+  itemsHasErrored: PropTypes.func.isRequired,
+
 };
 
 const mapStateToProps = (state) => {
@@ -110,20 +145,23 @@ const mapStateToProps = (state) => {
     hasErrored: state.itemsHasErrored,
     isLoading: state.itemsIsLoading,
     current: state.selectNote,
+    token: state.token,
+    id: state.id,
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    fetchData: (url, current, initial) => dispatch(itemsFetchData(url, current, initial)),
+    init: (url, token) => dispatch(init(url, token)),
     selectNote: noteId => dispatch(selectNote(noteId)),
     newNoteView: () => dispatch(newNoteView()),
-    postNewNote: (url, data) => dispatch(postNewNote(url, data)),
-    updateNote: (url, data) => dispatch(updateNote(url, data)),
-    deleteNote: url => dispatch(deleteNote(url)),
+    postNewNote: (url, data, token) => dispatch(postNewNote(url, data, token)),
+    updateNote: (url, data, token, id) => dispatch(updateNote(url, data, token, id)),
+    deleteNote: (url, token, id) => dispatch(deleteNote(url, token, id)),
+    itemsIsLoading: bool => dispatch(itemsIsLoading(bool)),
+    addToken: token => dispatch(addToken(token)),
+    itemsHasErrored: bool => dispatch(itemsHasErrored(bool)),
   };
 };
 
-
-export default connect(mapStateToProps, mapDispatchToProps)(App);
-
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App));
