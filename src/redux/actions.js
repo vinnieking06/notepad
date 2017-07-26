@@ -67,7 +67,8 @@ export function init(token) {
             })
                 .then(items => dispatch(itemsFetchDataSuccess(items.data)))
                 .catch(() => dispatch(itemsHasErrored(true)));
-      });
+      })
+     .catch(() => dispatch(itemsHasErrored(true)));
   };
 }
 
