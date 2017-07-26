@@ -25,7 +25,7 @@ const checkJwt = jwt({
     jwksUri: 'https://vinnieking06.auth0.com/.well-known/jwks.json',
   }),
 
-  audience: 'https://vinnieking06.auth0.com/api/v2/',
+  audience: 'https://vinnieking06/api/v2/',
   issuer: 'https://vinnieking06.auth0.com/',
   algorithms: ['RS256'],
 });

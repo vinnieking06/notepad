@@ -29353,16 +29353,39 @@ var App = function (_React$Component) {
       var localToken = localStorage.getItem('token');
       var match = RegExp('[#&]access_token=([^&]*)').exec(window.location.hash);
       if (localToken) {
-        var AuthStr = 'Bearer '.concat(localToken);
-        this.props.addToken(AuthStr);
+        this.headersToStore(localToken);
       } else if (match) {
-        var token = match && decodeURIComponent(match[1].replace(/\+/g, ' '));
-        localStorage.setItem('token', token);
-        var _AuthStr = 'Bearer '.concat(token);
-        this.props.addToken(_AuthStr);
+        var token = this.getParamFromHash('access_token');
+        this.configureLocalStorage(token);
+        this.headersToStore(token);
       } else {
         this.props.itemsHasErrored(true);
       }
+    }
+  }, {
+    key: 'getParamFromHash',
+    value: function getParamFromHash(param) {
+      var match = RegExp('[#&]' + param + '=([^&]*)').exec(window.location.hash);
+      return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+    }
+  }, {
+    key: 'headersToStore',
+    value: function headersToStore(token) {
+      var AuthStr = 'Bearer '.concat(token);
+      this.props.addToken(AuthStr);
+    }
+  }, {
+    key: 'configureLocalStorage',
+    value: function configureLocalStorage(token) {
+      localStorage.setItem('token', token);
+      var expiresAt = this.createExpiresAt();
+      localStorage.setItem('expires_at', expiresAt);
+    }
+  }, {
+    key: 'createExpiresAt',
+    value: function createExpiresAt() {
+      var date = this.getParamFromHash('expires_in');
+      return JSON.stringify(date * 1000 + new Date().getTime());
     }
   }, {
     key: 'initApi',
@@ -29414,6 +29437,8 @@ var App = function (_React$Component) {
     key: 'logOut',
     value: function logOut() {
       localStorage.removeItem('token');
+      localStorage.removeItem('expires_at');
+
       this.props.history.push('/');
     }
   }, {
@@ -29619,6 +29644,8 @@ function init(token) {
       }).catch(function () {
         return dispatch(itemsHasErrored(true));
       });
+    }).catch(function () {
+      return dispatch(itemsHasErrored(true));
     });
   };
 }
@@ -30968,6 +30995,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /* eslint-env browser */
 /* eslint react/prop-types: 0 */
+/* eslint class-methods-use-this: 0 */
 
 var Login = function (_React$Component) {
   _inherits(Login, _React$Component);
@@ -30981,9 +31009,15 @@ var Login = function (_React$Component) {
   _createClass(Login, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
-      if (localStorage.getItem('token') !== null) {
+      if (this.checkToken()) {
         this.props.history.push('/user');
       }
+    }
+  }, {
+    key: 'checkToken',
+    value: function checkToken() {
+      var expiresAt = JSON.parse(localStorage.getItem('expires_at'));
+      return new Date().getTime() < expiresAt && localStorage.getItem('token') !== null;
     }
   }, {
     key: 'render',
@@ -31003,7 +31037,7 @@ var Login = function (_React$Component) {
         ),
         _react2.default.createElement(
           'a',
-          { href: 'https://vinnieking06.auth0.com/authorize?audience=https://vinnieking06.auth0.com/api/v2/&scope=openid&response_type=token&client_id=OaxoFFEBwMQbEcLlERTltCHUEUSn5eYp&redirect_uri=https://stc-notepad.herokuapp.com/user' },
+          { href: 'https://vinnieking06.auth0.com/authorize?audience=https://vinnieking06/api/v2/&scope=openid&response_type=token&client_id=OaxoFFEBwMQbEcLlERTltCHUEUSn5eYp&redirect_uri=http://localhost:5000/user' },
           _react2.default.createElement(
             'button',
             null,

@@ -35,16 +35,35 @@ class App extends React.Component {
     const localToken = localStorage.getItem('token');
     const match = RegExp('[#&]access_token=([^&]*)').exec(window.location.hash);
     if (localToken) {
-      const AuthStr = 'Bearer '.concat(localToken);
-      this.props.addToken(AuthStr);
+      this.headersToStore(localToken);
     } else if (match) {
-      const token = match && decodeURIComponent(match[1].replace(/\+/g, ' '));
-      localStorage.setItem('token', token);
-      const AuthStr = 'Bearer '.concat(token);
-      this.props.addToken(AuthStr);
+      const token = this.getParamFromHash('access_token');
+      this.configureLocalStorage(token);
+      this.headersToStore(token);
     } else {
       this.props.itemsHasErrored(true);
     }
+  }
+
+  getParamFromHash(param) {
+    const match = RegExp(`[#&]${param}=([^&]*)`).exec(window.location.hash);
+    return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+  }
+
+  headersToStore(token) {
+    const AuthStr = 'Bearer '.concat(token);
+    this.props.addToken(AuthStr);
+  }
+
+  configureLocalStorage(token) {
+    localStorage.setItem('token', token);
+    const expiresAt = this.createExpiresAt();
+    localStorage.setItem('expires_at', expiresAt);
+  }
+
+  createExpiresAt() {
+    const date = this.getParamFromHash('expires_in');
+    return JSON.stringify((date * 1000) + new Date().getTime());
   }
 
   initApi() {
@@ -86,6 +105,8 @@ class App extends React.Component {
 
   logOut() {
     localStorage.removeItem('token');
+    localStorage.removeItem('expires_at');
+
     this.props.history.push('/');
   }
 
