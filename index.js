@@ -31037,7 +31037,7 @@ var Login = function (_React$Component) {
         ),
         _react2.default.createElement(
           'a',
-          { href: 'https://vinnieking06.auth0.com/authorize?audience=https://vinnieking06/api/v2/&scope=openid&response_type=token&client_id=OaxoFFEBwMQbEcLlERTltCHUEUSn5eYp&redirect_uri=http://localhost:5000/user' },
+          { href: 'https://vinnieking06.auth0.com/authorize?audience=https://vinnieking06/api/v2/&scope=openid&response_type=token&client_id=OaxoFFEBwMQbEcLlERTltCHUEUSn5eYp&redirect_uri=https://stc-notepad.herokuapp.com/user' },
           _react2.default.createElement(
             'button',
             null,
