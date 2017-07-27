@@ -31010,9 +31010,10 @@ var Login = function (_React$Component) {
     key: 'componentDidMount',
     value: function componentDidMount() {
       if (this.checkToken()) {
+        this.props.history.push('/user');
+      } else {
         localStorage.removeItem('access_token');
         localStorage.removeItem('expires_at');
-        this.props.history.push('/user');
       }
     }
   }, {
