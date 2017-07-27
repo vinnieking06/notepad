@@ -31012,7 +31012,7 @@ var Login = function (_React$Component) {
       if (this.checkToken()) {
         this.props.history.push('/user');
       } else {
-        localStorage.removeItem('access_token');
+        localStorage.removeItem('token');
         localStorage.removeItem('expires_at');
       }
     }
