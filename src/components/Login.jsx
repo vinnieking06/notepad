@@ -8,6 +8,8 @@ export default class Login extends React.Component {
 
   componentDidMount() {
     if (this.checkToken()) {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('expires_at');
       this.props.history.push('/user');
     }
   }
