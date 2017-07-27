@@ -9,6 +9,9 @@ export default class Login extends React.Component {
   componentDidMount() {
     if (this.checkToken()) {
       this.props.history.push('/user');
+    } else {
+      localStorage.removeItem('token');
+      localStorage.removeItem('expires_at');
     }
   }
 

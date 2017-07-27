@@ -31011,6 +31011,9 @@ var Login = function (_React$Component) {
     value: function componentDidMount() {
       if (this.checkToken()) {
         this.props.history.push('/user');
+      } else {
+        localStorage.removeItem('token');
+        localStorage.removeItem('expires_at');
       }
     }
   }, {
